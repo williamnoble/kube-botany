@@ -1,4 +1,4 @@
-id := `curl http://localhost:8080/ -s | jq '.[0].ID' -r`
+id := `curl http://localhost:8080/ -s | jq '.[0].Id' -r`
 
 api:
 	go run cmd/api/*.go

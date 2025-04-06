@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <!-- Plant stems -->
+    <path d="M12 6C12 6 12 14 12 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M10 10C8 8 6 9 6 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M14 8C16 6 18 7 18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+    <!-- Leaves -->
+    <circle cx="6" cy="11" r="2" fill="currentColor"/>
+    <circle cx="18" cy="9" r="2" fill="currentColor"/>
+    <circle cx="10" cy="5" r="2" fill="currentColor"/>
+
+    <!-- Pot -->
+    <path d="M9 18C9 18 8 21 12 21C16 21 15 18 15 18" fill="currentColor"/>
+</svg>

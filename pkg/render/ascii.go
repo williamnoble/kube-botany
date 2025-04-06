@@ -74,7 +74,7 @@ func (r *ASCIIRenderer) RenderFern(p *plant.Plant) string {
 	art = art + "\n"
 
 	// Add water level bar
-	waterBar := renderBar("Water", float64(p.WaterLevel), 100)
+	waterBar := renderBar("AddWater", float64(p.WaterLevel), 100)
 	art = art + waterBar + "\n"
 
 	// Add growth information
@@ -83,8 +83,8 @@ func (r *ASCIIRenderer) RenderFern(p *plant.Plant) string {
 	art = art + growthInfo + "\n"
 
 	// Add water consumption information
-	waterInfo := fmt.Sprintf("Water consumption: %d%% per day",
-		p.Characteristics.WaterConsumption)
+	waterInfo := fmt.Sprintf("AddWater consumption: %d%% per day",
+		p.WaterConsumptionRatePerDay)
 	art = art + waterInfo + "\n"
 
 	return art

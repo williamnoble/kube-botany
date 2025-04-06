@@ -2,28 +2,86 @@
 <!-- Cards grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4 mb-24">
     {{range .}}
-    <a href="/cards/{{.Name}}" class="group relative block rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+    <div class="group relative block rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+        <!-- Image with zoom effect -->
         <div class="relative aspect-[3/4] overflow-hidden">
-            <!-- Image with zoom effect -->
-            <img src="{{.Image}}" alt="{{.Name}}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+            <img
+                    src="{{.Image}}"
+                    alt="{{.Name}}"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            >
 
             <!-- Gradient overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent"></div>
 
-            <!-- Water level indicator as simple badge -->
-            <div class="absolute top-3 left-3">
-                <span class="text-xs font-semibold text-white bg-blue-500/70 px-2 py-1 rounded-full">Water: {{or .WaterLevel 30}}%</span>
+            <!-- AddWater level indicator with color-coded status -->
+            {{if lt .WaterLevel 20}}
+            <div class="absolute top-3 left-3 flex items-center bg-red-500/80 text-white px-2 py-1 rounded-full shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                </svg>
+                <span class="text-xs font-medium">{{.WaterLevel}}%</span>
             </div>
+            {{else}}
+            <div class="absolute top-3 left-3 flex items-center bg-blue-500/80 text-white px-2 py-1 rounded-full shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                </svg>
+                <span class="text-xs font-medium">{{.WaterLevel}}%</span>
+            </div>
+            {{end}}
 
-            <!-- Content overlay with properly aligned elements -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <div class="space-y-2 transform transition-all duration-300 group-hover:-translate-y-2">
-                    <h2 class="text-2xl font-bold">{{.Name}}</h2>
-                    <p class="text-sm text-white/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">{{.Info}}</p>
+            <!-- Modern day badge with backdrop blur effect - smaller size -->
+            <div class="absolute top-3 right-3 bg-white/30 backdrop-blur-md text-white rounded-lg px-2 py-1 shadow-sm border border-white/30">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="text-xs font-bold">DAY {{.DaysAlive}}</span>
                 </div>
             </div>
+
+            <!-- OPTION 3: Minimal square with clean layout - smaller size -->
+            <!--
+            <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 10px;">
+                <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>
+                <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>
+            </div>
+            -->
+
+            <!-- Content overlay with arrow aligned to bottom of type -->
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-black/0 pt-16 pb-4 px-5">
+                <!-- Plant name and type with arrow aligned to bottom -->
+                <div class="flex flex-col">
+                    <h2 class="text-xl font-bold text-white">{{.Name}}</h2>
+                    <div class="flex justify-between items-end">
+                        <p class="text-sm text-white/80">{{.Type}}</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Only show 'Needs water' warning below type/arrow row -->
+                {{if lt .WaterLevel 30}}
+                <div class="mt-2">
+                    <span class="text-red-400 text-xs font-medium">
+                        Needs water
+                    </span>
+                </div>
+                {{end}}
+            </div>
+
+            <!-- Make the entire card link to the plant details -->
+            <a href="/{{.Id}}" class="absolute inset-0 z-20">
+                <!-- This is an empty link that covers the entire card -->
+            </a>
         </div>
-    </a>
+    </div>
     {{end}}
 </div>
 {{end}}
