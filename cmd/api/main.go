@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/williamnoble/kube-botany/pkg/plant"
 	"github.com/williamnoble/kube-botany/pkg/render"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
@@ -12,7 +13,17 @@ import (
 )
 
 func main() {
+
 	s := NewServer(plant.Fern, "MyFern")
+
+	s.templates["index"] = template.Must(template.ParseFiles(
+		"cmd/api/templates/layout.html",
+		"cmd/api/templates/index.html"))
+
+	s.templates["plant"] = template.Must(template.ParseFiles(
+		"cmd/api/templates/layout.html",
+		"cmd/api/templates/plant.html"))
+
 	if err := s.Start(8080); err != nil {
 		panic(err)
 	}
@@ -23,6 +34,7 @@ type Server struct {
 	renderer  *render.ASCIIRenderer
 	startTime time.Time
 	plants    []*plant.Plant
+	templates map[string]*template.Template
 }
 
 type PlantResponse struct {
@@ -57,14 +69,21 @@ func NewServer(plantType plant.Type, plantName string) *Server {
 		logger:    logger,
 		startTime: time.Now(),
 		renderer:  render.NewASCIIRenderer(),
+		templates: make(map[string]*template.Template),
 	}
 }
 
 func (s *Server) Start(port int) error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", s.HandleIndex)
 	mux.HandleFunc("POST /water", s.HandleWater)
+	mux.HandleFunc("GET /cards", s.HandleCards)
+	// Add the new plant detail route with the Kubernetes-like naming
+	mux.HandleFunc("GET /cards/{id}", s.HandlePlantDetail)
+
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("cmd/api/static"))))
+	mux.HandleFunc("GET /", s.HandleIndex)
+
 	//mux.HandleFunc("POST /plant", s.handleNewPlant)
 	//mux.HandleFunc("GET /ascii", s.handleASCII)
 

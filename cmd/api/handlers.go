@@ -50,3 +50,62 @@ func (s *Server) HandleWater(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }
+
+func (s *Server) HandleCards(w http.ResponseWriter, r *http.Request) {
+	type NewPlant struct {
+		ID    string
+		Name  string
+		Image string
+		Info  string
+	}
+
+	data := []NewPlant{
+		{ID: "1", Name: "bonsai", Image: "/static/2025-04-06-bonsai-30.png", Info: "bonsai"},
+		{ID: "2", Name: "sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "sunflower"},
+	}
+
+	// Make sure you're executing the layout template
+	err := s.templates["index"].ExecuteTemplate(w, "layout.html", data)
+	if err != nil {
+		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
+		s.logger.Error("template error", "error", err)
+	}
+
+}
+
+// Add a new handler for plant detail pages
+func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
+	// Extract plant name from URL path
+	plantID := r.PathValue("id")
+
+	type NewPlant struct {
+		ID    string
+		Name  string
+		Image string
+		Info  string
+	}
+
+	// Find the plant with matching ID
+	var selectedPlant *NewPlant
+	for _, p := range []NewPlant{
+		{ID: "bonsai", Name: "bonsai", Image: "/static/2025-04-06-bonsai-30.png", Info: "A miniature tree in a small container"},
+		{ID: "sunflower", Name: "sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "A tall plant with bright yellow flowers"},
+	} {
+		if p.ID == plantID {
+			selectedPlant = &p
+			break
+		}
+	}
+
+	if selectedPlant == nil {
+		http.Error(w, "Plant not found", http.StatusNotFound)
+		return
+	}
+
+	// Execute only the plant.html template
+	err := s.templates["plant"].ExecuteTemplate(w, "layout.html", selectedPlant)
+	if err != nil {
+		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
+		s.logger.Error("template error", "error", err)
+	}
+}

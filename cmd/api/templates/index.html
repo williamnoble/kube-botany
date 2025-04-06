@@ -1,0 +1,13 @@
+{{define "content"}}
+<div class="card-grid">
+    {{range .}}
+    <a href="/cards/{{.Name}}" class="card">
+        <img src="{{.Image}}" alt="{{.Name}}" class="card-image">
+        <div class="card-content">
+            <h2 class="card-title">{{.Name}}</h2>
+            <p class="card-info">{{.Info}}</p>
+        </div>
+    </a>
+    {{end}}
+</div>
+{{end}}
