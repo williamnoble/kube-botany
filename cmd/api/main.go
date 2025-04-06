@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	s := NewServer(plant.Fern, "MyFern")
+	s := NewServer()
 
 	s.templates["index"] = template.Must(template.ParseFiles(
 		"cmd/api/templates/layout.html",
@@ -38,7 +38,7 @@ type Server struct {
 }
 
 type PlantResponse struct {
-	ID          string    `json:"ID"`
+	ID          string    `json:"Id"`
 	Name        string    `json:"name"`
 	Type        string    `json:"type"`
 	Age         string    `json:"age"`
@@ -57,13 +57,14 @@ type WaterRequest struct {
 	Id string `json:"id"` // NamespacedName
 }
 
-func NewServer(plantType plant.Type, plantName string) *Server {
+func NewServer() *Server {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
 	var plants []*plant.Plant
-	plants = append(plants, plant.NewPlant(plantName, plantType, false))
+	plants = append(plants, plant.NewPlant("DefaultBonsai123", "my-bonsai", plant.Bonsai, false))
+	plants = append(plants, plant.NewPlant("DefaultSunflower234", "my-sunflower", plant.Sunflower, false))
 	return &Server{
 		plants:    plants,
 		logger:    logger,
@@ -150,7 +151,7 @@ func (s *Server) decode(r *http.Request, v interface{}) error {
 
 func (s *Server) plantByID(id string) (*plant.Plant, error) {
 	for _, p := range s.plants {
-		if p.ID == id {
+		if p.Id == id {
 			return p, nil
 		}
 	}
@@ -160,7 +161,7 @@ func (s *Server) plantByID(id string) (*plant.Plant, error) {
 
 func (s *Server) plantResponse(p *plant.Plant) PlantResponse {
 	r := PlantResponse{
-		ID:          p.ID,
+		ID:          p.Id,
 		Name:        p.Name,
 		Type:        string(p.Type),
 		GrowthStage: p.GrowthStage.String(),

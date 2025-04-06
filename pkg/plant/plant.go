@@ -27,9 +27,10 @@ var CharacteristicsByPlantType = map[Type]Characteristic{
 type Type string
 
 var (
-	Bonsai Type = "bonsai"
-	Fern   Type = "fern"
-	Cactus Type = "cactus"
+	Bonsai    Type = "bonsai"
+	Fern      Type = "fern"
+	Cactus    Type = "cactus"
+	Sunflower Type = "sunflower"
 )
 
 type GrowthStage string
@@ -70,8 +71,8 @@ var healthThreshold = map[int64]string{
 }
 
 type Plant struct {
-	ID              string //NamespacedName
-	Name            string
+	Id              string //NamespacedName
+	Name            string // Fallback to ID when not provided
 	Type            Type
 	CreationTime    time.Time
 	Characteristics Characteristic
@@ -90,13 +91,17 @@ type Plant struct {
 	LastUpdated time.Time
 }
 
-func NewPlant(name string, plantType Type, canDie bool) *Plant {
+func NewPlant(
+	namespacedName string,
+	friendlyName string,
+	plantType Type,
+	canDie bool) *Plant {
 	now := time.Now()
 	characteristics := CharacteristicsByPlantType[plantType]
 
 	return &Plant{
-		ID:              name,
-		Name:            name,
+		Id:              namespacedName,
+		Name:            friendlyName,
 		Type:            plantType,
 		CreationTime:    now,
 		Characteristics: characteristics,
@@ -204,4 +209,9 @@ func (p *Plant) updateGrowthStage() {
 			return
 		}
 	}
+}
+
+func (p *Plant) Image() string {
+	formattedDate := time.Now().Format("2006-01-02")
+	return fmt.Sprintf("%s-%s-.png", formattedDate, p.Id)
 }

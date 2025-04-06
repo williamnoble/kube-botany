@@ -37,7 +37,7 @@ func (s *Server) HandleWater(w http.ResponseWriter, r *http.Request) {
 	message := "plant is fully watered and cannot be watered anymore."
 	unitsAdded := plant.Water(time.Now())
 	if unitsAdded > 0 {
-		message = fmt.Sprintf("added %d units of water to %s (%s watered).", unitsAdded, plant.ID, plant.WaterLevelPercent())
+		message = fmt.Sprintf("added %d units of water to %s (%s watered).", unitsAdded, plant.Id, plant.WaterLevelPercent())
 	}
 
 	response := WaterResponse{
@@ -61,8 +61,8 @@ func (s *Server) HandleCards(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := []NewPlant{
-		{ID: "1", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai-30.png", Info: "bonsai", WaterLevel: 100},
-		{ID: "2", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "sunflower", WaterLevel: 60},
+		{ID: "1", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai123.png", Info: "bonsai", WaterLevel: 100},
+		{ID: "2", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower123.png", Info: "sunflower", WaterLevel: 60},
 	}
 
 	// Make sure you're executing the layout template
@@ -71,10 +71,9 @@ func (s *Server) HandleCards(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
 		s.logger.Error("template error", "error", err)
 	}
-
 }
 
-// Add a new handler for plant detail pages
+// HandlePlantDetail Adds a new handler for plant detail pages
 func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 	// Extract plant name from URL path
 	plantName := r.PathValue("id")
@@ -88,11 +87,11 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 		Day        int
 	}
 
-	// Find the plant with matching ID
+	// Find the plant with matching Id
 	var selectedPlant *NewPlant
 	for _, p := range []NewPlant{
-		{ID: "bonsai", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai-30.png", Info: "A miniature tree in a small container", Day: 30, WaterLevel: 100},
-		{ID: "sunflower", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "A tall plant with bright yellow flowers", Day: 30, WaterLevel: 60},
+		{ID: "bonsai", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai123.png", Info: "A miniature tree in a small container", Day: 30, WaterLevel: 100},
+		{ID: "sunflower", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower123.png", Info: "A tall plant with bright yellow flowers", Day: 30, WaterLevel: 60},
 	} {
 		if p.Name == plantName {
 			selectedPlant = &p
