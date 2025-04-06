@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// requestLogger is a middleware that logs information about HTTP requests
+// It logs when a request starts with method, path, remote address, and user agent
+// It also logs when a request completes with method, path, and duration
 func (s *Server) requestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

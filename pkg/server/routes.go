@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// Routes sets up the HTTP routes for the server
+// It defines routes for static assets, API endpoints, and web pages
 func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()
 
@@ -13,16 +15,17 @@ func (s *Server) Routes() http.Handler {
 
 	// handle API Endpoints
 	r.Route("/api/plants", func(r chi.Router) {
-		r.Get("/", s.HandleIndex)
-		r.Get("/{id}", s.HandlePlant)
-		r.Delete("/{id}", s.HandlePlantDelete)
+		r.Get("/", s.HandleListPlants)         // GET /api/plants - List all plants
+		r.Get("/{id}", s.HandleGetPlant)       // GET /api/plants/{id} - Get a specific plant
+		r.Delete("/{id}", s.HandlePlantDelete) // DELETE /api/plants/{id} - Delete a plant
 	})
 
 	// handle Web
-	r.HandleFunc("GET /", s.HandleCards)
-	r.HandleFunc("POST /water", s.HandleWater)
-	r.HandleFunc("GET /{id}", s.HandlePlantDetail)
+	r.HandleFunc("GET /", s.HandleRenderHomePage)  // GET / - Render home page with all plants
+	r.HandleFunc("POST /water", s.HandleWater)     // POST /water - Add water to a plant
+	r.HandleFunc("GET /{id}", s.HandlePlantDetail) // GET /{id} - Render plant detail page
 
+	// Commented out routes for future implementation
 	//r.HandleFunc("POST /plant", s.handleNewPlant)
 	//r.HandleFunc("GET /ascii", s.handleASCII)
 

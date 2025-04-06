@@ -12,20 +12,23 @@ import (
 	"time"
 )
 
+// Server represents the HTTP server for the plant application
 type Server struct {
-	StaticDir    string
-	TemplatesDir string
-	templates    map[string]*template.Template
+	StaticDir    string                        // Directory for static assets
+	TemplatesDir string                        // Directory for HTML templates
+	templates    map[string]*template.Template // Parsed HTML templates
 
-	logger    *slog.Logger
-	startTime time.Time
+	logger    *slog.Logger // Logger for server logs
+	startTime time.Time    // Time when the server started
 
-	mu     sync.Mutex
-	plants []*plant.Plant
+	mu     sync.Mutex     // Mutex for thread-safe access to plants
+	plants []*plant.Plant // Collection of plants managed by the server
 
-	renderer *render.ASCIIRenderer
+	renderer *render.ASCIIRenderer // Renderer for ASCII art
 }
 
+// NewServer creates a new server instance with the given plants
+// It initializes the logger, renderer, templates, and other server components
 func NewServer(plants []*plant.Plant) *Server {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
@@ -46,6 +49,8 @@ func NewServer(plants []*plant.Plant) *Server {
 	return s
 }
 
+// Start starts the HTTP server on the specified port
+// It sets up the routes, adds the request logger middleware, and starts listening for requests
 func (s *Server) Start(port int) error {
 	mux := s.Routes()
 
