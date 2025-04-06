@@ -1,11 +1,11 @@
-package main
+package render
 
 import (
 	"fmt"
 	"github.com/williamnoble/kube-botany/pkg/plant"
 )
 
-// ASCIIRenderer renders plants as ASCII art
+// ASCIIRenderer render plants as ASCII art
 type ASCIIRenderer struct{}
 
 func NewASCIIRenderer() *ASCIIRenderer {
@@ -73,19 +73,19 @@ func (r *ASCIIRenderer) RenderFern(p *plant.Plant) string {
 	// Add status indicators
 	art = art + "\n"
 
-	// Add health bar
-	healthBar := renderBar("Health", p.Health, 100)
-	art = art + healthBar + "\n"
-
 	// Add water level bar
-	waterBar := renderBar("Water", p.WaterLevel, 100)
+	waterBar := renderBar("Water", float64(p.WaterLevel), 100)
 	art = art + waterBar + "\n"
 
-	// Add optimal water range
-	optimalRange := fmt.Sprintf("Optimal water range: %.1f%% - %.1f%%",
-		p.Characteristics.OptimalWaterMin,
-		p.Characteristics.OptimalWaterMax)
-	art = art + optimalRange + "\n"
+	// Add growth information
+	growthInfo := fmt.Sprintf("Growth: %d (Stage: %s)",
+		p.Growth, p.GrowthStage)
+	art = art + growthInfo + "\n"
+
+	// Add water consumption information
+	waterInfo := fmt.Sprintf("Water consumption: %d%% per day",
+		p.Characteristics.WaterConsumption)
+	art = art + waterInfo + "\n"
 
 	return art
 }

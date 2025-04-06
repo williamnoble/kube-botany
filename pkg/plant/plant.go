@@ -2,149 +2,200 @@ package plant
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"math"
+	"math/rand"
 	"time"
 )
 
-const (
-	maxWaterLevel = 10000 // 100.00%
+// CharacteristicsByPlantType creates a mapping of plant with
+// its requirements.
+var CharacteristicsByPlantType = map[Type]Characteristic{
+	Bonsai: {
+		GrowthRate:       22, // Matures in ~45 days
+		WaterConsumption: 5,  // 5% per day
+	},
+	Cactus: {
+		GrowthRate:       16, // Matures in ~60 days
+		WaterConsumption: 2,  // 2% per day
+	},
+	Fern: {
+		GrowthRate:       33, // Matures in ~30 days
+		WaterConsumption: 15, // 15% per day
+	},
+}
+
+type Type string
+
+var (
+	Bonsai Type = "bonsai"
+	Fern   Type = "fern"
+	Cactus Type = "cactus"
 )
 
+type GrowthStage string
+
+var (
+	Seeding   GrowthStage = "seeding"
+	Sprouting GrowthStage = "sprouting"
+	Growing   GrowthStage = "growing"
+	Maturing  GrowthStage = "maturing"
+	Dead      GrowthStage = "dead"
+)
+
+func (g GrowthStage) String() string {
+	return string(g)
+}
+
+type Characteristic struct {
+	// Growth rate per day
+	GrowthRate int64
+
+	// Water consumption per day (percentage)
+	WaterConsumption int64
+}
+
+// growthStageThreshold defines the stage a plant is in.
+var growthStageThreshold = map[GrowthStage]int64{
+	Dead:      -1,
+	Seeding:   0,
+	Sprouting: 100,
+	Growing:   500,
+	Maturing:  1000,
+}
+
+var healthThreshold = map[int64]string{
+	20: "Wilting/drooping plant",
+	60: "Normal healthy appearance",
+	80: "Vibrant, thriving appearance",
+}
+
 type Plant struct {
-	ID              string
+	ID              string //NamespacedName
 	Name            string
 	Type            Type
 	CreationTime    time.Time
 	Characteristics Characteristic
 
-	// whether the plant can die
+	// Whether the plant can die
 	CanDie bool
 
-	// Overall Health of the plant
-	Health int
-
 	// Water related properties
-	WaterLevel  int
-	LastWatered time.Time
+	WaterLevel        int
+	MinimumWaterLevel int
+	LastWatered       time.Time
 
 	// Growth related properties
 	GrowthStage GrowthStage
-	Growth      float64
+	Growth      int64
 	LastUpdated time.Time
 }
 
-func NewPlant(name string, plantType Type) *Plant {
+func NewPlant(name string, plantType Type, canDie bool) *Plant {
 	now := time.Now()
 	characteristics := CharacteristicsByPlantType[plantType]
 
 	return &Plant{
-		ID:              uuid.New().String(),
+		ID:              name,
 		Name:            name,
 		Type:            plantType,
 		CreationTime:    now,
 		Characteristics: characteristics,
-		CanDie:          true,
+		CanDie:          canDie,
 
 		GrowthStage: Seeding,
 		Growth:      0,
 		LastUpdated: now,
 
-		Health:      100,
-		WaterLevel:  50,
-		LastWatered: now,
+		WaterLevel:        50,
+		MinimumWaterLevel: 20,
+		LastWatered:       now,
 	}
 }
 
+// Update progresses the plant state based on elapsed time
 func (p *Plant) Update(currentTime time.Time) {
+	// First update water consumption
 	p.updateWaterConsumption(currentTime)
-	p.updateHealth(currentTime)
-	p.upgradeGrowth(currentTime)
-}
 
-// upgradeGrowth calculates upgradeGrowth depending on elapsed time and biome
-func (p *Plant) upgradeGrowth(currentTime time.Time) {
-	if p.IsDead() {
-		return
-	}
-
-	if p.Health <= MinimumGrowthThreshold {
+	// Update growth only if there's still water available
+	if p.WaterLevel > p.MinimumWaterLevel {
+		p.updateGrowth(currentTime)
+	} else {
+		// Just update the timestamp without growing
 		p.LastUpdated = currentTime
-		return
 	}
-
-	growth := calculateGrowthRate(p.Characteristics.GrowthRate, BiomeGrowthRateModifier, p.Health, currentTime.Sub(p.LastUpdated))
-
-	p.Growth += growth
-	p.updateGrowthStage()
-	p.LastUpdated = currentTime
 }
 
-func (p *Plant) Water(amount int, t time.Time) int {
-	const maxWaterLevel = 10000 // 100.00%
+// Water adds 1-5% water to the plant (up to 100%)
+func (p *Plant) Water(t time.Time) int {
+	// Fixed water increment of 5%
+	var waterIncrement = rand.Intn(5) + 1
 
-	// Check if already at maximum capacity
-	if p.WaterLevel >= maxWaterLevel {
-		p.LastWatered = t
-		return 0
+	// Add water (capped at 100%)
+	actualToAdd := waterIncrement
+	if p.WaterLevel+waterIncrement > 100 {
+		actualToAdd = 100 - p.WaterLevel
 	}
 
-	// Calculate how much we can actually add
-	spaceAvailable := maxWaterLevel - p.WaterLevel
-
-	// Determine actual amount to add
-	actualToAdd := amount
-	if actualToAdd > spaceAvailable {
-		actualToAdd = spaceAvailable
-	}
-
-	// Add water
+	// Add water and update last watered time
 	p.WaterLevel += actualToAdd
-
-	// Safety check (shouldn't be needed with integer math, but just in case)
-	if p.WaterLevel > maxWaterLevel {
-		p.WaterLevel = maxWaterLevel
-	}
-
-	// Update last watered time
 	p.LastWatered = t
 
 	return actualToAdd
 }
 
-func (p *Plant) WaterLevelFormatted() float64 {
-	return float64(p.WaterLevel) / 100.0
-}
-
-func (p *Plant) HealthPercent() string {
-	whole := p.Health / 100
-	decimal := p.Health % 100
-
-	// Format with one decimal place as per your original format
-	if decimal == 0 {
-		return fmt.Sprintf("%d%%", whole)
-	} else {
-		// For one decimal place, divide decimal by 10 and only show the first digit
-		return fmt.Sprintf("%d.%d%%", whole, decimal/10)
-	}
-}
-
+// WaterLevelPercent returns a string representation of the water level
 func (p *Plant) WaterLevelPercent() string {
-	whole := p.WaterLevel / 100
-	decimal := p.WaterLevel % 100
-
-	if decimal == 0 {
-		return fmt.Sprintf("%d%%", whole)
-	}
-	return fmt.Sprintf("%d.%02d%%", whole, decimal)
+	return fmt.Sprintf("%d%%", p.WaterLevel)
 }
 
-// updateGrowthStage changes the upgradeGrowth stage based on current upgradeGrowth value
-func (p *Plant) updateGrowthStage() {
-	if p.IsDead() {
-		return
+func (p *Plant) MaxWatered() bool {
+	return p.WaterLevel == 100
+}
+
+// updateWaterConsumption reduces water level based on elapsed time
+func (p *Plant) updateWaterConsumption(currentTime time.Time) {
+	elapsed := currentTime.Sub(p.LastWatered)
+	days := elapsed.Hours() / 24
+
+	// Calculate water consumed (integer percentage)
+	waterConsumed := int(float64(p.Characteristics.WaterConsumption) * days)
+
+	// Reduce water level
+	p.WaterLevel -= waterConsumed
+	if p.WaterLevel < 0 {
+		p.WaterLevel = 0
 	}
 
+	// Update LastWatered to current time
+	p.LastWatered = currentTime
+}
+
+// updateGrowth increases growth if there's water available
+func (p *Plant) updateGrowth(currentTime time.Time) {
+	// This function is only called when water level > 0
+	elapsed := currentTime.Sub(p.LastUpdated)
+	days := elapsed.Hours() / 24
+
+	// Calculate growth based on water level
+	// Full growth rate when water level is 50% or higher
+	// Reduced growth rate when water level is below 50%
+	growthMultiplier := 1.0
+	if p.WaterLevel < 50 {
+		growthMultiplier = float64(p.WaterLevel) / 50
+	}
+
+	// Calculate growth with float64 for accuracy, then convert to int64
+	growth := float64(p.Characteristics.GrowthRate) * growthMultiplier * days
+	p.Growth += int64(math.Floor(growth))
+
+	// Update growth stage
+	p.updateGrowthStage()
+	p.LastUpdated = currentTime
+}
+
+// updateGrowthStage updates the growth stage based on current growth value
+func (p *Plant) updateGrowthStage() {
 	stages := []GrowthStage{Maturing, Growing, Sprouting, Seeding}
 
 	for _, stage := range stages {
@@ -153,83 +204,4 @@ func (p *Plant) updateGrowthStage() {
 			return
 		}
 	}
-}
-
-func calculateGrowthRate(baseGrowthRate float64, biomeGrowthRateModifier float64, health float64, elapsedDuration time.Duration) float64 {
-	days := elapsedDuration.Hours() / 24
-	growth := baseGrowthRate * biomeGrowthRateModifier * (health / 100) * days
-	return growth
-}
-
-func (p *Plant) updateWaterConsumption(currentTime time.Time) {
-	if p.IsDead() {
-		return
-	}
-
-	elapsed := currentTime.Sub(p.LastWatered)
-	days := elapsed.Hours() / 24
-	waterConsumed := p.Characteristics.WaterConsumption * days
-	p.WaterLevel -= waterConsumed
-	if p.WaterLevel < 0 {
-		p.WaterLevel = 0
-	}
-}
-
-func (p *Plant) updateHealth(currentTime time.Time) {
-	if p.IsDead() {
-		return
-	}
-
-	elapsed := currentTime.Sub(p.LastWatered)
-	days := elapsed.Hours() / 24
-
-	if p.OptimalConditions() {
-		if p.Health < 100 {
-			p.Health += 5 * days
-			if p.Health > 100 {
-				p.Health = 100
-			}
-		}
-		return
-	}
-
-	var distance, maxPossibleDistance, damageRate float64
-
-	if p.WaterLevel < p.Characteristics.OptimalWaterMin {
-		distance = p.Characteristics.OptimalWaterMin - p.WaterLevel
-		maxPossibleDistance = p.Characteristics.OptimalWaterMin
-		damageRate = 10.0
-	}
-
-	if p.WaterLevel > p.Characteristics.OptimalWaterMax {
-		distance = p.WaterLevel - p.Characteristics.OptimalWaterMax
-		maxPossibleDistance = 100 - p.Characteristics.OptimalWaterMax
-		damageRate = 8.0
-	}
-
-	healthDecrease := (distance / maxPossibleDistance) * damageRate * days
-	p.Health -= healthDecrease
-
-	if p.Health < 0 {
-		p.Health = 0
-		if p.CanDie {
-			p.GrowthStage = Dead
-		}
-	}
-}
-
-func (p *Plant) OptimalConditions() bool {
-	return p.WaterLevel >= p.Characteristics.OptimalWaterMin &&
-		p.WaterLevel <= p.Characteristics.OptimalWaterMax
-}
-
-func (p *Plant) IsDead() bool {
-	if p.GrowthStage == Dead {
-		return true
-	}
-	return false
-}
-
-func RoundToTwoDecimal(val float64) float64 {
-	return math.Round(val*100) / 100
 }
