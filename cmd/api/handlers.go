@@ -53,15 +53,16 @@ func (s *Server) HandleWater(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleCards(w http.ResponseWriter, r *http.Request) {
 	type NewPlant struct {
-		ID    string
-		Name  string
-		Image string
-		Info  string
+		ID         string
+		Name       string
+		Image      string
+		Info       string
+		WaterLevel int
 	}
 
 	data := []NewPlant{
-		{ID: "1", Name: "bonsai", Image: "/static/2025-04-06-bonsai-30.png", Info: "bonsai"},
-		{ID: "2", Name: "sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "sunflower"},
+		{ID: "1", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai-30.png", Info: "bonsai", WaterLevel: 100},
+		{ID: "2", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "sunflower", WaterLevel: 60},
 	}
 
 	// Make sure you're executing the layout template
@@ -76,23 +77,26 @@ func (s *Server) HandleCards(w http.ResponseWriter, r *http.Request) {
 // Add a new handler for plant detail pages
 func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 	// Extract plant name from URL path
-	plantID := r.PathValue("id")
+	plantName := r.PathValue("id")
 
 	type NewPlant struct {
-		ID    string
-		Name  string
-		Image string
-		Info  string
+		ID         string
+		Name       string
+		Image      string
+		Info       string
+		WaterLevel int
+		Day        int
 	}
 
 	// Find the plant with matching ID
 	var selectedPlant *NewPlant
 	for _, p := range []NewPlant{
-		{ID: "bonsai", Name: "bonsai", Image: "/static/2025-04-06-bonsai-30.png", Info: "A miniature tree in a small container"},
-		{ID: "sunflower", Name: "sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "A tall plant with bright yellow flowers"},
+		{ID: "bonsai", Name: "my-bonsai-tree", Image: "/static/2025-04-06-bonsai-30.png", Info: "A miniature tree in a small container", Day: 30, WaterLevel: 100},
+		{ID: "sunflower", Name: "little-sunflower", Image: "/static/2025-04-06-sunflower.png", Info: "A tall plant with bright yellow flowers", Day: 30, WaterLevel: 60},
 	} {
-		if p.ID == plantID {
+		if p.Name == plantName {
 			selectedPlant = &p
+			fmt.Println("found selected plant")
 			break
 		}
 	}
