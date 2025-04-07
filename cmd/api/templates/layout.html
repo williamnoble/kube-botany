@@ -39,8 +39,57 @@
             }
         }
     </style>
+    <style>
+        .bottom-image {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-image: url('/static/images/botany.png');
+            background-position: bottom center;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .gradient-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom,
+            rgba(0,0,0,0) 0%,
+            rgba(0,0,0,0) 75%,
+            rgba(0,72,153,0.6) 100%); /* Dark blue with 20% opacity */
+
+            z-index: -1; /* Between the background image (-2) and content (default) */
+            pointer-events: none;
+        }
+
+        /* Dark mode version of the gradient with different colors */
+        html.dark .gradient-overlay {
+            background: linear-gradient(to bottom,
+            rgba(0,0,0,0) 0%,
+            rgba(0,0,0,0) 75%,
+            rgba(242, 3, 255, 0.3) 100%);
+        }
+
+
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen dark:bg-gray-900 transition-colors duration-300">
+
+<!-- Bottom Image -->
+<div class="bottom-image"></div>
+
+<!--&lt;!&ndash; Gradient Overlay &ndash;&gt;-->
+<!--<div class="gradient-overlay"></div>-->
+
+
 <!-- Theme toggle button with sun/moon icons -->
 <div class="absolute top-4 right-4 z-10">
     <button
@@ -75,6 +124,7 @@
         Garden your containers like never before
     </p>
 </div>
+
 
 <!-- Image Modal -->
 <div id="imageModal"

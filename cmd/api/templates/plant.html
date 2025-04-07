@@ -11,14 +11,23 @@
 <!--        </div>-->
         <!-- OPTION 3: Minimal square with clean layout - smaller size -->
 <!--        &lt;!&ndash;-->
-        <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 18px;">
-            <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>
-            <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>
-        </div>
+<!--        <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 18px;">-->
+<!--            <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>-->
+<!--            <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>-->
+<!--        </div>-->
 
 
         <!-- Image with natural dimensions and rounded corners -->
         <img src="{{.Image}}" alt="{{.Name}}" class="max-h-[80vh] object-contain rounded-2xl shadow-lg">
+
+    <!-- Translucent download button in bottom right corner -->
+    <a href="{{.Image}}" download class="absolute bottom-4 right-4 bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+    </a>
+
     </div>
+
 </div>
 {{end}}

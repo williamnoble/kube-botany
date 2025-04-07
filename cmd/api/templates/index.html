@@ -11,8 +11,8 @@
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             >
 
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent"></div>
+            <!--            &lt;!&ndash; Gradient overlay &ndash;&gt;-->
+            <!--            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>-->
 
             <!-- AddWater level indicator with color-coded status -->
             {{if lt .WaterLevel 20}}
@@ -32,25 +32,32 @@
             {{end}}
 
             <!-- Modern day badge with backdrop blur effect - smaller size -->
-            <div class="absolute top-3 right-3 bg-white/30 backdrop-blur-md text-white rounded-lg px-2 py-1 shadow-sm border border-white/30">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span class="text-xs font-bold">DAY {{.DaysAlive}}</span>
-                </div>
-            </div>
+<!--            <div class="absolute top-3 right-3 bg-white/30 backdrop-blur-md text-white rounded-lg px-2 py-1 shadow-sm border border-white/30">-->
+<!--                <div class="flex items-center">-->
+<!--                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">-->
+<!--                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>-->
+<!--                        <line x1="16" y1="2" x2="16" y2="6"></line>-->
+<!--                        <line x1="8" y1="2" x2="8" y2="6"></line>-->
+<!--                        <line x1="3" y1="10" x2="21" y2="10"></line>-->
+<!--                    </svg>-->
+<!--                    <span class="text-xs font-bold">DAY {{.DaysAlive}}</span>-->
+<!--                </div>-->
+<!--            </div>-->
 
             <!-- OPTION 3: Minimal square with clean layout - smaller size -->
-            <!--
-            <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 10px;">
-                <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>
-                <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>
+<!--            &lt;!&ndash;-->
+<!--            <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 10px;">-->
+<!--                <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>-->
+<!--                <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>-->
+<!--            </div>-->
+
+            <!-- Days Alive -->
+            <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-full shadow-sm overflow-hidden text-xs">
+                <div class="flex items-center">
+                    <div class="bg-emerald-700 px-2 py-1">DAY</div>
+                    <div class="font-bold px-2 py-1 min-w-[2rem] text-center">{{.DaysAlive}}</div>
+                </div>
             </div>
-            -->
 
             <!-- Content overlay with arrow aligned to bottom of type -->
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-black/0 pt-16 pb-4 px-5">
