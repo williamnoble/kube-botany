@@ -7,14 +7,16 @@ import (
 
 // PlantDTO represents a plant in API responses and UI rendering
 type PlantDTO struct {
-	Id          string    `json:"id"`           // Unique identifier for the plant
-	Name        string    `json:"name"`         // Display name for the plant
-	Type        string    `json:"type"`         // Type of plant (e.g., bonsai, sunflower)
-	Age         string    `json:"age"`          // Age of the plant as a formatted string
-	Growth      int64     `json:"growth"`       // Growth value of the plant
-	GrowthStage string    `json:"stage"`        // Current growth stage (e.g., seeding, sprouting)
-	WaterLevel  int       `json:"water"`        // Current water level (0-100%)
-	WateredLast time.Time `json:"watered_last"` // Time when the plant was last watered
+	Id           string    `json:"id"`            // Unique identifier for the plant
+	Name         string    `json:"name"`          // Display name for the plant
+	Type         string    `json:"type"`          // Type of plant (e.g., bonsai, sunflower)
+	Age          string    `json:"age"`           // Age of the plant as a formatted string
+	Growth       int64     `json:"growth"`        // Growth value of the plant
+	GrowthStage  string    `json:"stage"`         // Current growth stage (e.g., seeding, sprouting)
+	WaterLevel   int       `json:"water"`         // Current water level (0-100%)
+	WateredLast  time.Time `json:"watered_last"`  // Time when the plant was last watered
+	CreationTime time.Time `json:"creation_time"` // Time when the plant was created (matches CR)
+
 	// Fields used for UI rendering
 	Image     string `json:"image,omitempty"`      // Path to the plant's image
 	DaysAlive int    `json:"days_alive,omitempty"` // Number of days the plant has been alive

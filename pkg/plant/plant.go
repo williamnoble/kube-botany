@@ -16,7 +16,7 @@ type Plant struct {
 	// Whether the plant can die
 	CanDie bool
 
-	// AddWater related properties
+	// Water related properties
 	WaterConsumptionRatePerDay int // Random, between 2-6% per day
 	MinimumWaterLevel          int
 	WaterLevel                 int
@@ -27,6 +27,10 @@ type Plant struct {
 	Growth      int64
 	GrowthStage GrowthStage
 	LastUpdated time.Time
+
+	// Generation related properties
+	Backdrop string
+	Mascot   string
 }
 
 func NewPlant(

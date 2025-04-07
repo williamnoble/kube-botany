@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/williamnoble/kube-botany/pkg/plant"
 	"net/http"
 	"time"
 )
@@ -70,17 +71,12 @@ func (s *Server) HandlePlantDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// HandleWater adds water to a plant
+// HandleWaterPlant adds water to a plant
 // It accepts a JSON request with a plant ID, adds water to the plant, and returns a response with a message and the updated plant
-func (s *Server) HandleWater(w http.ResponseWriter, r *http.Request) {
-	var waterReq WaterRequest
-	err := s.decode(r, &waterReq)
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
+func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
 
-	plant, err := s.plantByID(waterReq.Id)
+	plant, err := s.plantByID(id)
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
 		return
@@ -110,6 +106,7 @@ func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
 	for _, plant := range s.plants {
 		dto := s.plantDTO(plant)
 		dto.Image = fmt.Sprintf("/static/images/%s", plant.Image())
+		fmt.Println("looking for image: ", plant.Image(), dto.Image)
 		if dto.Name == "" {
 			dto.Name = dto.Id
 		}
@@ -154,6 +151,27 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
 		s.logger.Error("template error", "error", err)
 	}
+}
+
+func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
+	var dto PlantDTO
+	err := s.decode(r, &dto)
+	if err != nil {
+		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	p := plant.NewPlant(
+		dto.Id,
+		dto.Name,
+		plant.Sunflower, // TODO: Fix this typing
+		dto.CreationTime,
+		false,
+	)
+
+	s.plants = append(s.plants, p)
+	w.WriteHeader(http.StatusCreated)
+
 }
 
 //
