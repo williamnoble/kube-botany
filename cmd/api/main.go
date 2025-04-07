@@ -19,7 +19,7 @@ func populatePlants() []*plant.Plant {
 		"DefaultBonsai123",
 		"my-bonsai",
 		plant.Bonsai,
-		time.Now().AddDate(0, 0, -123),
+		time.Now(),
 		false))
 	plants = append(plants, plant.NewPlant(
 		"DefaultSunflower234",

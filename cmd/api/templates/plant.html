@@ -2,32 +2,57 @@
 <div class="flex justify-center items-center">
     <!-- Single container with relative positioning for the counter -->
     <div class="relative">
-<!--        &lt;!&ndash; Day counter badge in top right corner with softer styling &ndash;&gt;-->
-<!--        <div class="absolute top-4 right-4 bg-emerald-600 bg-opacity-85 text-white font-bold rounded-full w-16 h-16 flex items-center justify-center shadow-md z-10">-->
-<!--            <div>-->
-<!--                <div class="text-xs text-center">DAY</div>-->
-<!--                <div class="text-2xl text-center">{{.DaysAlive}}</div>-->
-<!--            </div>-->
-<!--        </div>-->
-        <!-- OPTION 3: Minimal square with clean layout - smaller size -->
-<!--        &lt;!&ndash;-->
-<!--        <div class="absolute top-3 right-3 bg-emerald-600 text-white rounded-md shadow-sm overflow-hidden" style="font-size: 18px;">-->
-<!--            <div class="bg-emerald-700 px-1.5 py-px text-center">DAY</div>-->
-<!--            <div class="font-bold text-center px-1.5 py-px">{{.DaysAlive}}</div>-->
-<!--        </div>-->
-
-
         <!-- Image with natural dimensions and rounded corners -->
         <img src="{{.Image}}" alt="{{.Name}}" class="max-h-[80vh] object-contain rounded-2xl shadow-lg">
 
-    <!-- Translucent download button in bottom right corner -->
-    <a href="{{.Image}}" download class="absolute bottom-4 right-4 bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-    </a>
+        <!-- Buttons container at the bottom right -->
+        <div class="absolute bottom-4 right-4 flex">
+            <!-- Water drop button with tooltip -->
+            {{if lt .WaterLevel 100}}
+            <div class="relative group">
+                <button onclick="waterPlant('{{.Id}}')"
+                        class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512.053 512.053" fill="none" stroke="currentColor" stroke-width="24">
+                        <path d="M261.36,437.387C202.48,437.28,154.8,389.6,154.693,330.72c0-5.867-4.8-10.667-10.667-10.667 c-5.867,0-10.667,4.8-10.667,10.667c0.107,70.613,57.387,127.893,128,128c5.867,0,10.667-4.8,10.667-10.667 C272.027,442.187,267.227,437.387,261.36,437.387z"></path>
+                        <path d="M263.387,3.04c-4.16-4.053-10.773-4.053-14.827,0C241.733,9.76,80.027,169.333,80.027,332.213 c0,99.2,78.933,179.84,176,179.84s176-80.64,176-179.84C432.027,168.373,270.32,9.76,263.387,3.04z M256.027,490.72 c-85.333,0-154.667-71.147-154.667-158.507c0-134.613,122.88-272.747,154.667-306.24 c31.787,33.387,154.667,170.88,154.667,306.24C410.693,419.573,341.253,490.72,256.027,490.72z"></path>
+                    </svg>
+                </button>
+                <!-- Tooltip that appears on hover -->
+                <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 invisible group-hover:visible
+                            bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    Add Water ({{.WaterLevel}}/100)
+                </div>
+            </div>
+            {{ end }}
 
+            <!-- Translucent download button -->
+            <a href="{{.Image}}" download class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </a>
+        </div>
     </div>
-
 </div>
+
+<script>
+    function waterPlant(plantId) {
+        fetch(`/api/plants/water/${plantId}`, {
+            method: 'POST',
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                } else {
+                    console.error('Failed to water plant');
+                    alert('Failed to water plant. Please try again later.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while watering the plant.');
+            });
+    }
+</script>
 {{end}}

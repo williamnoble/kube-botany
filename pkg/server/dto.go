@@ -37,11 +37,6 @@ func (s *Server) plantDTO(p *plant.Plant) PlantDTO {
 		DaysAlive:   p.DaysAlive(),
 	}
 
-	// Special case for testing an unwatered plant
-	if r.Id == "DefaultSunflower234" {
-		r.WaterLevel = 10 // test unwatered plant
-	}
-
 	return r
 }
 
