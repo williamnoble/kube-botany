@@ -14,8 +14,8 @@ import (
 
 // Server represents the HTTP server for the plant application
 type Server struct {
-	StaticDir    string                        // Directory for static assets
-	TemplatesDir string                        // Directory for HTML templates
+	staticDir    string                        // Directory for static assets
+	templatesDir string                        // Directory for HTML templates
 	templates    map[string]*template.Template // Parsed HTML templates
 
 	logger    *slog.Logger // Logger for server logs
@@ -41,8 +41,8 @@ func NewServer(plants []*plant.Plant) *Server {
 		startTime:    time.Now(),
 		renderer:     render.NewASCIIRenderer(),
 		templates:    make(map[string]*template.Template),
-		StaticDir:    "cmd/api/static",
-		TemplatesDir: "cmd/api/templates",
+		staticDir:    "cmd/api/static",
+		templatesDir: "cmd/api/templates",
 	}
 	s.ParseTemplates()
 

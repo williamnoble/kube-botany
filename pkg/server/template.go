@@ -10,10 +10,10 @@ import (
 // It parses the "plant" template from layout.html and plant.html
 func (s *Server) ParseTemplates() {
 	s.templates["index"] = template.Must(template.ParseFiles(
-		filepath.Join(s.TemplatesDir, "/layout.html"),
-		filepath.Join(s.TemplatesDir, "/index.html")))
+		filepath.Join(s.templatesDir, "/layout.html"),
+		filepath.Join(s.templatesDir, "/index.html")))
 
 	s.templates["plant"] = template.Must(template.ParseFiles(
-		filepath.Join(s.TemplatesDir, "/layout.html"),
-		filepath.Join(s.TemplatesDir, "/plant.html")))
+		filepath.Join(s.templatesDir, "/layout.html"),
+		filepath.Join(s.templatesDir, "/plant.html")))
 }
