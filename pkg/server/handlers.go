@@ -10,6 +10,7 @@ import (
 
 // HandleListPlants returns a list of all plants as JSON
 func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("sleep failed")
 	var response []PlantDTO
 	for _, p := range s.plants {
 		p.Update(time.Now())
@@ -19,7 +20,7 @@ func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
 
 	err := s.encode(w, r, http.StatusOK, response)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
 	}
 }
 
@@ -43,7 +44,7 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 
 	err := s.encode(w, r, http.StatusOK, response)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
 	}
 }
 
@@ -95,13 +96,15 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 
 	err = s.encode(w, r, http.StatusOK, response)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
 	}
 }
 
 // HandleRenderHomePage renders the home page with cards for all plants
 // It converts each plant to a DTO, sets the image path, and renders the index.html template
 func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
+	//time.Sleep(30 * time.Second)
+
 	var data []PlantDTO
 	for _, plant := range s.plants {
 		dto := s.plantDTO(plant)
@@ -117,7 +120,7 @@ func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
 	err := s.templates["index"].ExecuteTemplate(w, "layout.html", data)
 	if err != nil {
 		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		s.logger.Error("template error", "error", err)
+		s.Logger.Error("template error", "error", err)
 	}
 }
 
@@ -149,7 +152,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 	err := s.templates["plant"].ExecuteTemplate(w, "layout.html", dto)
 	if err != nil {
 		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		s.logger.Error("template error", "error", err)
+		s.Logger.Error("template error", "error", err)
 	}
 }
 

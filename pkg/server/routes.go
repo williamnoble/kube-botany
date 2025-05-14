@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Routes sets up the HTTP routes for the server
+// Routes sets up the HTTP routes for the httpServer
 // It defines routes for static assets, API endpoints, and web pages
 func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()

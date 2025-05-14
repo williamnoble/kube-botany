@@ -3,11 +3,11 @@ package server
 import "time"
 
 func (s *Server) BackgroundTasks() {
-	imgSvc := NewMockImageGenerationService(s.staticDir, s.logger)
+	imgSvc := NewMockImageGenerationService(s.staticDir, s.Logger)
 	// run the task once on startup
 	err := imgSvc.imageTask(s.plants)
 	if err != nil {
-		s.logger.Error("error", err)
+		s.Logger.Error("error", err)
 	}
 
 	ticker := time.NewTimer(24 * time.Hour)
@@ -15,7 +15,7 @@ func (s *Server) BackgroundTasks() {
 	for range ticker.C {
 		err = imgSvc.imageTask(s.plants)
 		if err != nil {
-			s.logger.Error("error", err)
+			s.Logger.Error("error", err)
 		}
 	}
 }
