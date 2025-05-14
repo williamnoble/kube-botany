@@ -1,0 +1,128 @@
+package server
+
+import (
+	"context"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
+	"github.com/williamnoble/kube-botany/pkg/plant"
+	"io"
+	"log/slog"
+	"os"
+	"strings"
+)
+
+type ImageGeneratorFunction func(plant string) error
+
+type ImageGenerationService struct {
+	logger    *slog.Logger
+	staticDir string
+	generator ImageGeneratorFunction
+}
+
+func NewImageGenerationService(staticDir string, logger *slog.Logger) *ImageGenerationService {
+	s := ImageGenerationService{
+		staticDir: staticDir,
+		logger:    logger,
+	}
+	s.generator = s.GenerateImageOpenAI
+	return &s
+}
+
+func NewMockImageGenerationService(
+	staticDir string,
+	logger *slog.Logger) *ImageGenerationService {
+	s := ImageGenerationService{
+		staticDir: staticDir,
+		logger:    logger,
+	}
+	s.generator = s.GenerateMockImage
+	return &s
+}
+
+func (s *ImageGenerationService) imageTask(plants []*plant.Plant) error {
+	var errs []error
+	for _, p := range plants {
+		plantImageName := p.Image()
+		plantImagePath := fmt.Sprintf("%s/images/%s", s.staticDir, plantImageName)
+		_, err := os.Stat(plantImagePath)
+
+		if os.IsNotExist(err) {
+			s.logger.Info("generating missing image", "image", plantImageName)
+			err := s.generator(plantImageName)
+			if err != nil {
+				s.logger.Error("image generation failed", "image", plantImageName, "error", err.Error())
+				errs = append(errs, fmt.Errorf("failed to generate image %s: %w", plantImageName, err))
+				continue
+			}
+			s.logger.Info("image generated successfully", "image", plantImageName)
+		} else if err != nil {
+			s.logger.Error("failed to check if image exists", "image", plantImageName, "error", err.Error())
+			errs = append(errs, fmt.Errorf("failed to check image %s: %w", plantImageName, err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("imageTask encountered %d errors: %w", len(errs), errors.Join(errs...))
+	}
+
+	return nil
+}
+
+func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
+
+	client := openai.NewClient(
+		option.WithBaseURL("https://openrouter.ai/api/v1"))
+
+	ctx := context.Background()
+	prompt := "A robot ladybird in a forest of trees."
+
+	image, err := client.Images.Generate(ctx, openai.ImageGenerateParams{
+		Prompt:         prompt,
+		Model:          openai.ImageModelDallE3,
+		ResponseFormat: openai.ImageGenerateParamsResponseFormatB64JSON,
+		N:              openai.Int(1),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	imageBytes, err := base64.StdEncoding.DecodeString(image.Data[0].B64JSON)
+	if err != nil {
+		panic(err)
+	}
+
+	dest := "./image.png"
+	println("Writing image to " + dest)
+	err = os.WriteFile(dest, imageBytes, 0755)
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
+func (s *ImageGenerationService) GenerateMockImage(plant string) error {
+	plantName := strings.Split(plant, "-")[3]
+	defaultBonsai := fmt.Sprintf("%s/images/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
+	destination := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
+	src, err := os.Open(defaultBonsai)
+	if err != nil {
+		return fmt.Errorf("error opening source file: %w", err)
+	}
+	defer src.Close()
+
+	dst, err := os.Create(destination)
+	if err != nil {
+		return fmt.Errorf("error opening destination file: %w", err)
+	}
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return fmt.Errorf("error copying file contents: %w", err)
+	}
+
+	return nil
+}
