@@ -1,4 +1,4 @@
-package server
+package gen
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
-	"github.com/williamnoble/kube-botany/pkg/plant"
+	"github.com/williamnoble/kube-botany/plant"
 	"io"
 	"log/slog"
 	"os"
@@ -42,7 +42,7 @@ func NewMockImageGenerationService(
 	return &s
 }
 
-func (s *ImageGenerationService) imageTask(plants []*plant.Plant) error {
+func (s *ImageGenerationService) ImageTask(plants []*plant.Plant) error {
 	var errs []error
 	for _, p := range plants {
 		plantImageName := p.Image()
@@ -65,7 +65,7 @@ func (s *ImageGenerationService) imageTask(plants []*plant.Plant) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("imageTask encountered %d errors: %w", len(errs), errors.Join(errs...))
+		return fmt.Errorf("ImageTask encountered %d errors: %w", len(errs), errors.Join(errs...))
 	}
 
 	return nil
@@ -125,4 +125,19 @@ func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	}
 
 	return nil
+}
+
+func GenerateText() {
+	client := openai.NewClient(
+		option.WithBaseURL("https://openrouter.ai/api/v1"))
+	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.UserMessage("Say this is a test"),
+		},
+		Model: openai.ChatModelGPT4o,
+	})
+	if err != nil {
+		panic(err.Error())
+	}
+	println(chatCompletion.Choices[0].Message.Content)
 }

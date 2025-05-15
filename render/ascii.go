@@ -2,7 +2,7 @@ package render
 
 import (
 	"fmt"
-	"github.com/williamnoble/kube-botany/pkg/plant"
+	"github.com/williamnoble/kube-botany/plant"
 )
 
 // ASCIIRenderer render plants as ASCII art
@@ -74,12 +74,12 @@ func (r *ASCIIRenderer) RenderFern(p *plant.Plant) string {
 	art = art + "\n"
 
 	// Add water level bar
-	waterBar := renderBar("AddWater", float64(p.WaterLevel), 100)
+	waterBar := renderBar("AddWater", float64(p.CurrentWaterLevel), 100)
 	art = art + waterBar + "\n"
 
 	// Add growth information
-	growthInfo := fmt.Sprintf("Growth: %d (Stage: %s)",
-		p.Growth, p.GrowthStage)
+	growthInfo := fmt.Sprintf("CurrentGrowth: %d (Stage: %s)",
+		p.CurrentGrowth, p.GrowthStage)
 	art = art + growthInfo + "\n"
 
 	// Add water consumption information

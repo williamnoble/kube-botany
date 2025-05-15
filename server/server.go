@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/williamnoble/kube-botany/pkg/plant"
-	"github.com/williamnoble/kube-botany/pkg/render"
+	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/render"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -22,7 +22,8 @@ type Server struct {
 	Logger    *slog.Logger // Logger for httpServer logs
 	startTime time.Time    // Time when the httpServer started
 
-	mu     sync.Mutex     // Mutex for thread-safe access to plants
+	mu     sync.Mutex // Mutex for thread-safe access to plants
+	store  *plant.Store
 	plants []*plant.Plant // Collection of plants managed by the httpServer
 
 	renderer *render.ASCIIRenderer // Renderer for ASCII art
@@ -37,6 +38,7 @@ func NewServer(plants []*plant.Plant) *Server {
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
+	store := plant.NewStore()
 
 	s := &Server{
 		plants:       plants,
@@ -46,6 +48,7 @@ func NewServer(plants []*plant.Plant) *Server {
 		templates:    make(map[string]*template.Template),
 		staticDir:    "cmd/api/static",
 		templatesDir: "cmd/api/templates",
+		store:        store,
 	}
 	s.ParseTemplates()
 
@@ -58,7 +61,7 @@ func (s *Server) Start(port int) error {
 	mux := s.Routes()
 	addr := fmt.Sprintf(":%d", port)
 
-	s.Logger.Info("starting httpServer", "addr", addr)
+	s.Logger.Info("starting server", "addr", addr)
 
 	s.httpServer = &http.Server{
 		Addr:         addr,

@@ -29,10 +29,3 @@ var healthThreshold = map[int64]string{
 	60: "Normal healthy appearance",
 	80: "Vibrant, thriving appearance",
 }
-
-type Type string
-
-var (
-	Bonsai    Type = "bonsai"
-	Sunflower Type = "sunflower"
-)

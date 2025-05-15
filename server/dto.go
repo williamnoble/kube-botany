@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/williamnoble/kube-botany/pkg/plant"
+	"github.com/williamnoble/kube-botany/plant"
 	"time"
 )
 
@@ -27,11 +27,11 @@ type PlantDTO struct {
 func (s *Server) plantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		Id:          p.Id,
-		Name:        p.Name,
+		Name:        p.FriendlyName,
 		Type:        string(p.Type),
 		GrowthStage: p.GrowthStage.String(),
 		Age:         time.Since(p.CreationTime).Round(time.Second).String(),
-		WaterLevel:  p.WaterLevel,
+		WaterLevel:  p.CurrentWaterLevel,
 		WateredLast: p.LastWatered,
 		Image:       "",
 		DaysAlive:   p.DaysAlive(),

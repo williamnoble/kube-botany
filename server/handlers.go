@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/williamnoble/kube-botany/pkg/plant"
+	"github.com/williamnoble/kube-botany/plant"
 	"net/http"
 	"time"
 )
@@ -167,7 +167,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	p := plant.NewPlant(
 		dto.Id,
 		dto.Name,
-		plant.Sunflower, // TODO: Fix this typing
+		"sunflower",
 		dto.CreationTime,
 		false,
 	)
@@ -182,7 +182,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 //	currentPlant.Update(time.Now())
 //	currentPlant.GrowthStage = plant.Maturing
 //	asciiArt := s.renderer.RenderFern(currentPlant)
-//	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+//	w.Header().Set("Content-TypeCharacteristics", "text/plain; charset=utf-8")
 //	w.WriteHeader(http.StatusOK)
 //	w.Write([]byte(asciiArt))
 //}
