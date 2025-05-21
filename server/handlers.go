@@ -10,10 +10,12 @@ import (
 
 // HandleListPlants returns a list of all plants as JSON
 func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("sleep failed")
 	var response []PlantDTO
-	for _, p := range s.plants {
-		p.Update(time.Now())
+	for _, p := range s.store.ListAllPlants() {
+		err := s.store.UpdatePlantById(p.NamespacedName)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 		plant := s.plantDTO(p)
 		response = append(response, plant)
 	}
@@ -29,7 +31,7 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	var found bool
 	var response PlantDTO
-	for _, p := range s.plants {
+	for _, p := range s.store.Plants {
 		if p.Id == id {
 			found = true
 			p.Update(time.Now())
@@ -110,8 +112,8 @@ func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
 		dto := s.plantDTO(plant)
 		dto.Image = fmt.Sprintf("/static/images/%s", plant.Image())
 		fmt.Println("looking for image: ", plant.Image(), dto.Image)
-		if dto.Name == "" {
-			dto.Name = dto.Id
+		if dto.FriendlyName == "" {
+			dto.FriendlyName = dto.NamespacedName
 		}
 		data = append(data, dto)
 	}
@@ -137,8 +139,8 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 			found = true
 			dto = s.plantDTO(plant)
 			dto.Image = fmt.Sprintf("/static/images/%s", plant.Image())
-			if dto.Name == "" {
-				dto.Name = dto.Id
+			if dto.FriendlyName == "" {
+				dto.FriendlyName = dto.NamespacedName
 			}
 		}
 	}
@@ -165,8 +167,8 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := plant.NewPlant(
-		dto.Id,
-		dto.Name,
+		dto.NamespacedName,
+		dto.FriendlyName,
 		"sunflower",
 		dto.CreationTime,
 		false,
@@ -182,7 +184,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 //	currentPlant.Update(time.Now())
 //	currentPlant.GrowthStage = plant.Maturing
 //	asciiArt := s.renderer.RenderFern(currentPlant)
-//	w.Header().Set("Content-TypeCharacteristics", "text/plain; charset=utf-8")
+//	w.Header().Set("Content-Variety", "text/plain; charset=utf-8")
 //	w.WriteHeader(http.StatusOK)
 //	w.Write([]byte(asciiArt))
 //}

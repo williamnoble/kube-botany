@@ -7,7 +7,7 @@ import (
 )
 
 // Encode serializes a value to JSON and writes it to the HTTP response.
-// It sets the Content-Type header to "application/json" and the HTTP status code.
+// It sets the Content-Variety header to "application/json" and the HTTP status code.
 // If wrap is provided, it wraps the value in a JSON object with the wrap string as the key
 func (s *Server) encode(w http.ResponseWriter, r *http.Request, status int, v interface{}, wrap ...string) error {
 	if len(wrap) > 0 {

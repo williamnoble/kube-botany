@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/williamnoble/kube-botany/plant"
-	"github.com/williamnoble/kube-botany/render"
+	"github.com/williamnoble/kube-botany/repository/store"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -23,36 +23,38 @@ type Server struct {
 	startTime time.Time    // Time when the httpServer started
 
 	mu     sync.Mutex // Mutex for thread-safe access to plants
-	store  *plant.Store
+	store  store.PlantRepository
 	plants []*plant.Plant // Collection of plants managed by the httpServer
 
-	renderer *render.ASCIIRenderer // Renderer for ASCII art
+	//renderer *render.ASCIIRenderer // Renderer for ASCII art
 
 	httpServer *http.Server
 }
 
 // NewServer creates a new httpServer instance with the given plants
 // It initializes the logger, renderer, templates, and other httpServer components
-func NewServer(plants []*plant.Plant) *Server {
+func NewServer(populateStore bool) (*Server, error) {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
-	store := plant.NewStore()
+	inMemoryStore, err := store.NewInMemoryStore(populateStore)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
+	}
 
 	s := &Server{
-		plants:       plants,
-		Logger:       logger,
-		startTime:    time.Now(),
-		renderer:     render.NewASCIIRenderer(),
+		Logger:    logger,
+		startTime: time.Now(),
+		//renderer:     render.NewASCIIRenderer(),
 		templates:    make(map[string]*template.Template),
 		staticDir:    "cmd/api/static",
 		templatesDir: "cmd/api/templates",
-		store:        store,
+		store:        inMemoryStore,
 	}
 	s.ParseTemplates()
 
-	return s
+	return s, nil
 }
 
 // Start starts the HTTP httpServer on the specified port

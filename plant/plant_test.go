@@ -12,7 +12,7 @@ package plant
 //	p := NewPlant("MyBonsai", "DefaultBonsai123", "bonsai", currentTime, false)
 //
 //	// Log initial state
-//	t.Logf("Created plant: %s (TypeCharacteristics: %s)", p.FriendlyName, p.TypeCharacteristics)
+//	t.Logf("Created plant: %s (Variety: %s)", p.FriendlyName, p.Variety)
 //	t.Logf("Initial state: Stage=%s, AddWater=%d%%, CurrentGrowth=%d",
 //		p.GrowthStage, p.WaterLevel, p.Growth)
 //
@@ -212,7 +212,7 @@ package plant
 //		t.Run(tc.name, func(t *testing.T) {
 //			p := NewPlant("test", "My Bonsai", "bonsai", time.Now(), false)
 //			p.Growth = tc.growth
-//			p.updateGrowthStage()
+//			p.GrowthStage()
 //			assert.Equal(t, tc.expectStage, p.GrowthStage)
 //		})
 //	}

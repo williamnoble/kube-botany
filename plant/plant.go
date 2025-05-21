@@ -11,16 +11,7 @@ var (
 	MinimumWaterLevel = 20
 )
 
-type TypeCharacteristics struct {
-	Type                  string `json:"type"`
-	GrowthRate            int64  `json:"growthRate"`       // between 4-6 weeks at max growth
-	WaterConsumptionUnits int64  `json:"waterRequirement"` // 0-1 scale per day
-}
-
-var TypeCharacteristicsMap = map[string]TypeCharacteristics{}
-
-type GenerationProperties struct {
-	// Generation related properties
+type Generator struct {
 	Backdrop string
 	Mascot   string
 }
@@ -36,7 +27,7 @@ type Health struct {
 type Plant struct {
 	NamespacedName string
 	FriendlyName   string
-	Type           string
+	Variety        string
 	CreationTime   time.Time
 	LastUpdated    time.Time // TODO: I think we can deprecate LastWatered and retain LastUpdated, or remove both...
 
@@ -44,20 +35,20 @@ type Plant struct {
 }
 
 // Update progresses the plant state based on elapsed time
-func (p *Plant) Update(currentTime time.Time) {
-	p.updateWaterConsumption(currentTime)
+func (p *Plant) Update(currentTime time.Time, t Variety) {
+	p.updateWaterConsumption(currentTime, t)
 	if p.Health.CurrentWaterLevel > MinimumWaterLevel {
-		p.updateGrowth(currentTime)
+		p.updateGrowth(currentTime, t)
 	} else {
 		p.LastUpdated = currentTime
 	}
 	// TODO: Add death logic
 }
 
-func (p *Plant) updateWaterConsumption(currentTime time.Time) {
+func (p *Plant) updateWaterConsumption(currentTime time.Time, t Variety) {
 	elapsed := currentTime.Sub(p.Health.LastWatered)
 	days := elapsed.Hours() / 24
-	waterConsumed := int(float64(TypeCharacteristicsMap[p.Type].WaterConsumptionUnits) * days)
+	waterConsumed := int(float64(t.WaterConsumptionUnits) * days)
 	p.Health.CurrentWaterLevel -= waterConsumed
 	if p.Health.CurrentWaterLevel < 0 {
 		p.Health.CurrentWaterLevel = 0
@@ -65,7 +56,7 @@ func (p *Plant) updateWaterConsumption(currentTime time.Time) {
 	p.Health.LastWatered = currentTime
 }
 
-func (p *Plant) updateGrowth(currentTime time.Time) {
+func (p *Plant) updateGrowth(currentTime time.Time, t Variety) {
 	elapsed := currentTime.Sub(p.LastUpdated)
 	days := elapsed.Hours() / 24
 
@@ -77,22 +68,20 @@ func (p *Plant) updateGrowth(currentTime time.Time) {
 		growthMultiplier = 0.0
 	}
 
-	growth := float64(TypeCharacteristicsMap[p.Type].GrowthRate) * growthMultiplier * days
+	growth := float64(t.GrowthRate) * growthMultiplier * days
 	p.Health.CurrentGrowth += int64(math.Round(growth))
-
-	p.updateGrowthStage()
 	p.LastUpdated = currentTime
 }
 
-// updateGrowthStage updates the growth stage based on current growth value
-func (p *Plant) updateGrowthStage() {
+// GrowthStage updates the growth stage based on the current growth value
+func (p *Plant) GrowthStage() string {
 	stages := []GrowthStage{Maturing, Growing, Sprouting, Seeding}
 	for _, stage := range stages {
 		if p.Health.CurrentGrowth >= growthStageThreshold[stage] {
-			p.Health.GrowthStage = stage
-			return
+			return stage.String()
 		}
 	}
+	return "dead"
 }
 
 func (p *Plant) Image() string {
@@ -130,6 +119,10 @@ func (p *Plant) AddWater(t time.Time) int {
 	p.Health.LastWatered = t
 
 	return actualToAdd
+}
+
+func (p *Plant) WaterLevel() int {
+	return p.Health.CurrentWaterLevel
 }
 
 // RenderGrowthStage maps a plant growth stage to a UIGrowthStage with UI-specific information
