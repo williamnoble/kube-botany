@@ -17,10 +17,20 @@ type TypeCharacteristics struct {
 	WaterConsumptionUnits int64  `json:"waterRequirement"` // 0-1 scale per day
 }
 
+var TypeCharacteristicsMap = map[string]TypeCharacteristics{}
+
 type GenerationProperties struct {
 	// Generation related properties
 	Backdrop string
 	Mascot   string
+}
+
+type Health struct {
+	// Health State (config-map?)
+	CurrentGrowth     int64
+	CurrentWaterLevel int
+	LastWatered       time.Time   // TODO: can we remove this? perhaps compute on a 24 hour basis as a bg task.
+	GrowthStage       GrowthStage // TODO: this can be computed to avoid storing in the struct
 }
 
 type Plant struct {
@@ -28,22 +38,15 @@ type Plant struct {
 	FriendlyName   string
 	Type           string
 	CreationTime   time.Time
+	LastUpdated    time.Time // TODO: I think we can deprecate LastWatered and retain LastUpdated, or remove both...
 
-	// Water-related properties
-	CurrentGrowth     int64
-	CurrentWaterLevel int
-
-	LastWatered time.Time
-
-	// CurrentGrowth-related properties
-	GrowthStage GrowthStage
-	LastUpdated time.Time
+	Health Health
 }
 
 // Update progresses the plant state based on elapsed time
 func (p *Plant) Update(currentTime time.Time) {
 	p.updateWaterConsumption(currentTime)
-	if p.CurrentWaterLevel > MinimumWaterLevel {
+	if p.Health.CurrentWaterLevel > MinimumWaterLevel {
 		p.updateGrowth(currentTime)
 	} else {
 		p.LastUpdated = currentTime
@@ -52,14 +55,14 @@ func (p *Plant) Update(currentTime time.Time) {
 }
 
 func (p *Plant) updateWaterConsumption(currentTime time.Time) {
-	elapsed := currentTime.Sub(p.LastWatered)
+	elapsed := currentTime.Sub(p.Health.LastWatered)
 	days := elapsed.Hours() / 24
-	waterConsumed := int(float64(p.WaterConsumptionRatePerDay) * days)
-	p.CurrentWaterLevel -= waterConsumed
-	if p.CurrentWaterLevel < 0 {
-		p.CurrentWaterLevel = 0
+	waterConsumed := int(float64(TypeCharacteristicsMap[p.Type].WaterConsumptionUnits) * days)
+	p.Health.CurrentWaterLevel -= waterConsumed
+	if p.Health.CurrentWaterLevel < 0 {
+		p.Health.CurrentWaterLevel = 0
 	}
-	p.LastWatered = currentTime
+	p.Health.LastWatered = currentTime
 }
 
 func (p *Plant) updateGrowth(currentTime time.Time) {
@@ -67,15 +70,15 @@ func (p *Plant) updateGrowth(currentTime time.Time) {
 	days := elapsed.Hours() / 24
 
 	growthMultiplier := 1.0
-	if p.CurrentWaterLevel < 50 {
-		growthMultiplier = float64(p.CurrentWaterLevel) / 50
+	if p.Health.CurrentWaterLevel < 50 {
+		growthMultiplier = float64(p.Health.CurrentWaterLevel) / 50
 	}
-	if p.CurrentWaterLevel < 20 {
+	if p.Health.CurrentWaterLevel < 20 {
 		growthMultiplier = 0.0
 	}
 
-	growth := float64(p.GrowthRate) * growthMultiplier * days
-	p.CurrentGrowth += int64(math.Round(growth))
+	growth := float64(TypeCharacteristicsMap[p.Type].GrowthRate) * growthMultiplier * days
+	p.Health.CurrentGrowth += int64(math.Round(growth))
 
 	p.updateGrowthStage()
 	p.LastUpdated = currentTime
@@ -85,8 +88,8 @@ func (p *Plant) updateGrowth(currentTime time.Time) {
 func (p *Plant) updateGrowthStage() {
 	stages := []GrowthStage{Maturing, Growing, Sprouting, Seeding}
 	for _, stage := range stages {
-		if p.CurrentGrowth >= growthStageThreshold[stage] {
-			p.GrowthStage = stage
+		if p.Health.CurrentGrowth >= growthStageThreshold[stage] {
+			p.Health.GrowthStage = stage
 			return
 		}
 	}
@@ -94,7 +97,7 @@ func (p *Plant) updateGrowthStage() {
 
 func (p *Plant) Image() string {
 	formattedDate := time.Now().Format("2006-01-02")
-	return fmt.Sprintf("%s-%s.png", formattedDate, p.Id)
+	return fmt.Sprintf("%s-%s.png", formattedDate, p.NamespacedName)
 }
 
 func (p *Plant) DaysAlive() int {
@@ -118,13 +121,13 @@ func (p *Plant) AddWater(t time.Time) int {
 
 	// Add water (capped at 100%)
 	actualToAdd := waterIncrement
-	if p.CurrentWaterLevel+waterIncrement > 100 {
-		actualToAdd = 100 - p.CurrentWaterLevel
+	if p.Health.CurrentWaterLevel+waterIncrement > 100 {
+		actualToAdd = 100 - p.Health.CurrentWaterLevel
 	}
-	p.CurrentWaterLevel += actualToAdd
+	p.Health.CurrentWaterLevel += actualToAdd
 
 	// We need to know when la
-	p.LastWatered = t
+	p.Health.LastWatered = t
 
 	return actualToAdd
 }
