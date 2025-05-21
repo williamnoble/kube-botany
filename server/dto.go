@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/williamnoble/kube-botany/plant"
 	"time"
 )
@@ -19,8 +20,8 @@ type PlantDTO struct {
 	Image string `json:"image,omitempty"` // Path to the plant's image
 }
 
-// plantDTO converts a plant.Plant to a PlantDTO for API responses and UI rendering
-func (s *Server) plantDTO(p *plant.Plant) PlantDTO {
+// intoPlantDTO converts a plant.Plant to a PlantDTO for API responses and UI rendering
+func (s *Server) intoPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		NamespacedName:    p.NamespacedName,
 		FriendlyName:      p.FriendlyName,
@@ -29,7 +30,22 @@ func (s *Server) plantDTO(p *plant.Plant) PlantDTO {
 		DaysAlive:         p.DaysAlive(),
 		CurrentWaterLevel: p.WaterLevel(),
 		GrowthStage:       p.GrowthStage(),
-		Image:             "",
+		Image:             fmt.Sprintf("/static/images/%s", p.Image()),
+	}
+
+	return r
+}
+
+// fromPlantDTO converts from PlantDTO to *plant.Plant for API responses and UI rendering
+func (s *Server) fromPlantDTO(p *plant.Plant) PlantDTO {
+	r := PlantDTO{
+		NamespacedName:    p.NamespacedName,
+		FriendlyName:      p.FriendlyName,
+		Variety:           p.Variety,
+		Age:               time.Since(p.CreationTime).Round(time.Second).String(),
+		DaysAlive:         p.DaysAlive(),
+		CurrentWaterLevel: p.WaterLevel(),
+		GrowthStage:       p.GrowthStage(),
 	}
 
 	return r

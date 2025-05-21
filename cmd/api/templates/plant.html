@@ -3,14 +3,14 @@
     <!-- Single container with relative positioning for the counter -->
     <div class="relative">
         <!-- Image with natural dimensions and rounded corners -->
-        <img src="{{.Image}}" alt="{{.Name}}" class="max-h-[80vh] object-contain rounded-2xl shadow-lg">
+        <img src="{{.Image}}" alt="{{.FriendlyName}}" class="max-h-[80vh] object-contain rounded-2xl shadow-lg">
 
         <!-- Buttons container at the bottom right -->
         <div class="absolute bottom-4 right-4 flex">
             <!-- Water drop button with tooltip -->
-            {{if lt .WaterLevel 100}}
+            {{if lt .CurrentWaterLevel 100}}
             <div class="relative group">
-                <button onclick="waterPlant('{{.Id}}')"
+                <button onclick="waterPlant('{{.NamespacedName}}')"
                         class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center mr-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512.053 512.053" fill="none" stroke="currentColor" stroke-width="24">
                         <path d="M261.36,437.387C202.48,437.28,154.8,389.6,154.693,330.72c0-5.867-4.8-10.667-10.667-10.667 c-5.867,0-10.667,4.8-10.667,10.667c0.107,70.613,57.387,127.893,128,128c5.867,0,10.667-4.8,10.667-10.667 C272.027,442.187,267.227,437.387,261.36,437.387z"></path>
@@ -20,7 +20,7 @@
                 <!-- Tooltip that appears on hover -->
                 <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 invisible group-hover:visible
                             bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                    Add Water ({{.WaterLevel}}/100)
+                    Add Water ({{.CurrentWaterLevel}}/100)
                 </div>
             </div>
             {{ end }}

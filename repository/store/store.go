@@ -23,7 +23,7 @@ type PlantRepository interface {
 	ListPlantsByType(plantType string) (map[string][]string, error)
 
 	// ListAllPlants List all plants
-	ListAllPlants() map[string]plant.Plant
+	ListAllPlants() map[string]*plant.Plant
 
 	// UpdatePlants Update all plants' state
 	UpdatePlants(namespacedNames []string) error
@@ -42,7 +42,7 @@ type PlantRepository interface {
 }
 
 type InMemoryStore struct {
-	Plants          map[string]plant.Plant
+	Plants          map[string]*plant.Plant
 	PlantsByVariety map[string][]string
 	Varieties       plant.Varieties
 }
@@ -54,7 +54,7 @@ func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
 	}
 
 	s := InMemoryStore{
-		Plants:          make(map[string]plant.Plant),
+		Plants:          make(map[string]*plant.Plant),
 		Varieties:       props,
 		PlantsByVariety: make(map[string][]string),
 	}
@@ -87,22 +87,32 @@ func (s *InMemoryStore) NewPlant(
 		LastWatered:       time.Now(),
 	}
 
-	return &plant.Plant{
+	p := &plant.Plant{
 		NamespacedName: namespacedName,
 		FriendlyName:   friendlyName,
 		Variety:        plantType,
 		CreationTime:   creationTime,
 		LastUpdated:    creationTime,
 		Health:         health,
-	}, nil
+	}
+
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	s.Plants[namespacedName] = p
+	s.PlantsByVariety[plantType] = append(s.PlantsByVariety[plantType], namespacedName)
+
+	return p, nil
 }
 
 func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
-	var found *plant.Plant
-	if _, ok := s.Plants[id]; !ok {
+	p, ok := s.Plants[id]
+	if !ok {
 		return nil, errors.New("plant not found")
 	}
-	return found, nil
+	return p, nil
+
 }
 
 func (s *InMemoryStore) UpdatePlantById(namespacedName string) error {
@@ -145,7 +155,7 @@ func (s *InMemoryStore) ListPlantsByType(plantType string) (map[string][]string,
 	return s.PlantsByVariety, nil
 }
 
-func (s *InMemoryStore) ListAllPlants() map[string]plant.Plant {
+func (s *InMemoryStore) ListAllPlants() map[string]*plant.Plant {
 	return s.Plants
 }
 
@@ -187,6 +197,7 @@ func (s *InMemoryStore) populateSamplePlants() {
 		"sunflower",
 		time.Now(),
 	)
+
 }
 
 func (s *InMemoryStore) ListSupportedVarieties() []string {

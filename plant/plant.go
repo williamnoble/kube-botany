@@ -125,6 +125,11 @@ func (p *Plant) WaterLevel() int {
 	return p.Health.CurrentWaterLevel
 }
 
+func (p *Plant) Validate() error {
+	// TODO, implement Zod or Zog? I forgot
+	return nil
+}
+
 // RenderGrowthStage maps a plant growth stage to a UIGrowthStage with UI-specific information
 func (p *Plant) RenderGrowthStage(stage GrowthStage) UIGrowthStage {
 	growthStages := map[GrowthStage]UIGrowthStage{

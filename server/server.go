@@ -39,6 +39,7 @@ func NewServer(populateStore bool) (*Server, error) {
 	})
 	logger := slog.New(logHandler)
 	inMemoryStore, err := store.NewInMemoryStore(populateStore)
+	fmt.Printf("Created new store: %v\n", inMemoryStore)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
 	}

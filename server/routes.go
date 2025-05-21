@@ -18,8 +18,8 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/", s.HandleListPlants)         // GET /api/plants - List all plants
 		r.Get("/{id}", s.HandleGetPlant)       // GET /api/plants/{id} - Get a specific plant
 		r.Delete("/{id}", s.HandlePlantDelete) // DELETE /api/plants/{id} - Delete a plant
-		r.Post("/", s.HandleCreatePlant)       // POST /api/plants - Create a plant
 		r.Post("/water/{id}", s.HandleWaterPlant)
+		r.Post("/", s.HandleCreatePlant) // POST /api/plants - Create a plant
 	})
 
 	// handle Web

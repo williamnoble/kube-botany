@@ -7,7 +7,7 @@
         <div class="relative aspect-[3/4] overflow-hidden">
             <img
                     src="{{.Image}}"
-                    alt="{{.Name}}"
+                    alt="{{.FriendlyName}}"
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             >
 
@@ -15,19 +15,19 @@
             <!--            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>-->
 
             <!-- AddWater level indicator with color-coded status -->
-            {{if lt .WaterLevel 20}}
+            {{if lt .CurrentWaterLevel 20}}
             <div class="absolute top-3 left-3 flex items-center bg-red-500/80 text-white px-2 py-1 rounded-full shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                 </svg>
-                <span class="text-xs font-medium">{{.WaterLevel}}%</span>
+                <span class="text-xs font-medium">{{.CurrentWaterLevel}}%</span>
             </div>
             {{else}}
             <div class="absolute top-3 left-3 flex items-center bg-blue-500/80 text-white px-2 py-1 rounded-full shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                 </svg>
-                <span class="text-xs font-medium">{{.WaterLevel}}%</span>
+                <span class="text-xs font-medium">{{.CurrentWaterLevel}}%</span>
             </div>
             {{end}}
 
@@ -63,9 +63,9 @@
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-black/0 pt-16 pb-4 px-5">
                 <!-- Plant name and type with arrow aligned to bottom -->
                 <div class="flex flex-col">
-                    <h2 class="text-xl font-bold text-white">{{.Name}}</h2>
+                    <h2 class="text-xl font-bold text-white">{{.FriendlyName}}</h2>
                     <div class="flex justify-between items-end">
-                        <p class="text-sm text-white/80">{{.Type}}</p>
+                        <p class="text-sm text-white/80">{{.Variety}}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                             <polyline points="12 5 19 12 12 19"></polyline>
@@ -75,7 +75,7 @@
             </div>
 
             <!-- Make the entire card link to the plant details -->
-            <a href="/{{.Id}}" class="absolute inset-0 z-20">
+            <a href="/{{.NamespacedName}}" class="absolute inset-0 z-20">
                 <!-- This is an empty link that covers the entire card -->
             </a>
         </div>

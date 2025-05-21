@@ -1,0 +1,12 @@
+{
+  "bonsai": {
+    "growth_rate":  24,
+    "water_requirement_units_per_day": 2,
+    "minimum_water_level": 20
+  },
+  "sunflower": {
+    "growth_rate":  25,
+    "water_requirement_units_per_day": 2,
+    "minimum_water_level": 20
+  }
+}
