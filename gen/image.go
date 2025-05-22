@@ -39,11 +39,14 @@ func NewMockImageGenerationService(
 		logger:    logger,
 	}
 	s.generator = s.GenerateMockImage
+	s.logger.Info("configured mock image generation service")
+
 	return &s
 }
 
-func (s *ImageGenerationService) ImageTask(plants []*plant.Plant) error {
+func (s *ImageGenerationService) ImageTask(plants map[string]*plant.Plant) error {
 	var errs []error
+
 	for _, p := range plants {
 		plantImageName := p.Image()
 		plantImagePath := fmt.Sprintf("%s/images/%s", s.staticDir, plantImageName)

@@ -49,8 +49,8 @@ func NewServer(populateStore bool) (*Server, error) {
 		startTime: time.Now(),
 		//renderer:     render.NewASCIIRenderer(),
 		templates:    make(map[string]*template.Template),
-		staticDir:    "cmd/api/static",
-		templatesDir: "cmd/api/templates",
+		staticDir:    "static",
+		templatesDir: "static/templates",
 		store:        inMemoryStore,
 	}
 	s.ParseTemplates()
@@ -74,7 +74,6 @@ func (s *Server) Start(port int) error {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	s.Logger.Info("starting background tasks")
 	go s.BackgroundTasks()
 
 	return s.httpServer.ListenAndServe()
