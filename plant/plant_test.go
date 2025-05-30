@@ -2,6 +2,7 @@ package plant_test
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/williamnoble/kube-botany/plant"
 	"github.com/williamnoble/kube-botany/repository/store"
 	"os"
@@ -17,9 +18,9 @@ func newInMemoryStore(t *testing.T) store.PlantRepository {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..")
 	err := os.Chdir(dir)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	s, err := store.NewInMemoryStore(false)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return s
 }
 
@@ -28,7 +29,8 @@ func testPlant(t *testing.T) (*plant.Plant, time.Time) {
 	currentTime := time.Now()
 	s.NewPlant("FooPlant", "MyBonsai", "bonsai", currentTime)
 	p, err := s.GetPlant("FooPlant")
-	assert.NoError(t, err)
+	require.Equal(t, currentTime, p.LastUpdated)
+	require.NoError(t, err)
 	return p, currentTime
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 // Variety is the plant type. Ideally, we'd use `Variety` but similarity
@@ -19,8 +18,7 @@ type Variety struct {
 
 type Varieties = map[string]Variety
 
-func VarietiesFromJson() (Varieties, error) {
-	filePath := filepath.Join("./plant/", "varieties.json")
+func VarietiesFromJson(filePath string) (Varieties, error) {
 	var varieties Varieties
 
 	fileData, err := os.ReadFile(filePath)

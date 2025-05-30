@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/williamnoble/kube-botany/plant"
 	"maps"
+	"path/filepath"
 	"slices"
 	"time"
 )
@@ -48,7 +49,8 @@ type InMemoryStore struct {
 }
 
 func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
-	props, err := plant.VarietiesFromJson()
+	filePath := filepath.Join("./plant/", "varieties.json")
+	props, err := plant.VarietiesFromJson(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
 	}
