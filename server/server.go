@@ -22,7 +22,7 @@ type Server struct {
 	Logger    *slog.Logger // Logger for httpServer logs
 	startTime time.Time    // Time when the httpServer started
 
-	mu     sync.Mutex // Mutex for thread-safe access to plants
+	mu     sync.RWMutex // Mutex for thread-safe access to plants
 	store  store.PlantRepository
 	plants []*plant.Plant // Collection of plants managed by the httpServer
 

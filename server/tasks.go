@@ -13,7 +13,7 @@ func (s *Server) BackgroundTasks() {
 	plants := s.store.ListAllPlants()
 	err := imgSvc.ImageTask(plants)
 	if err != nil {
-		s.Logger.Error("error", err)
+		s.Logger.Error("error processing task", "error", err)
 	}
 
 	ticker := time.NewTimer(24 * time.Hour)
@@ -21,7 +21,7 @@ func (s *Server) BackgroundTasks() {
 	for range ticker.C {
 		err = imgSvc.ImageTask(plants)
 		if err != nil {
-			s.Logger.Error("error", err)
+			s.Logger.Error("error processing task", "error", err)
 		}
 	}
 }

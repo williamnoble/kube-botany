@@ -27,7 +27,8 @@ func newInMemoryStore(t *testing.T) store.PlantRepository {
 func testPlant(t *testing.T) (*plant.Plant, time.Time) {
 	s := newInMemoryStore(t)
 	currentTime := time.Now()
-	s.NewPlant("FooPlant", "MyBonsai", "bonsai", currentTime)
+	_, err := s.NewPlant("FooPlant", "MyBonsai", "bonsai", currentTime)
+	require.NoError(t, err)
 	p, err := s.GetPlant("FooPlant")
 	require.Equal(t, currentTime, p.LastUpdated)
 	require.NoError(t, err)
