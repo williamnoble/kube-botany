@@ -35,6 +35,7 @@ type Plant struct {
 }
 
 // Update progresses the plant state based on elapsed time
+// Water consumption is calculated, assuming the plant is appropriated watered, it grows.
 func (p *Plant) Update(currentTime time.Time, t Variety) {
 	p.updateWaterConsumption(currentTime, t)
 	if p.Health.CurrentWaterLevel > MinimumWaterLevel {
@@ -42,38 +43,39 @@ func (p *Plant) Update(currentTime time.Time, t Variety) {
 	} else {
 		p.LastUpdated = currentTime
 	}
-	// TODO: Add death logic
 }
 
+// updateWaterConsumption calculates and applies water consumption since the last update.
 func (p *Plant) updateWaterConsumption(currentTime time.Time, t Variety) {
-	elapsed := currentTime.Sub(p.Health.LastWatered)
+	// calculate elapsed time in days, since the last update
+	elapsed := currentTime.Sub(p.LastUpdated)
 	days := elapsed.Hours() / 24
+
+	//  determining water consumed based on the consumption rate of a particular variety of plant.
 	waterConsumed := int(float64(t.WaterConsumptionUnits) * days)
+
+	// reducing the current water level, (bounded at zero).
 	p.Health.CurrentWaterLevel -= waterConsumed
 	if p.Health.CurrentWaterLevel < 0 {
 		p.Health.CurrentWaterLevel = 0
 	}
-	p.Health.LastWatered = currentTime
+
 }
 
+// updateGrowth calculates and applies growth progress since the last update.
 func (p *Plant) updateGrowth(currentTime time.Time, t Variety) {
 	elapsed := currentTime.Sub(p.LastUpdated)
 	days := elapsed.Hours() / 24
 
-	growthMultiplier := 1.0
-	if p.Health.CurrentWaterLevel < 50 {
-		growthMultiplier = float64(p.Health.CurrentWaterLevel) / 50
-	}
-	if p.Health.CurrentWaterLevel < 20 {
-		growthMultiplier = 0.0
-	}
-
-	growth := float64(t.GrowthRate) * growthMultiplier * days
+	// Growth is determined solely by the elapsed time and the plant's growth rate.
+	// The growth accumulates in CurrentGrowth, which is used to determine the
+	// plant's growth stage.
+	growth := float64(t.GrowthRate) * days
 	p.Health.CurrentGrowth += int64(math.Round(growth))
 	p.LastUpdated = currentTime
 }
 
-// GrowthStage updates the growth stage based on the current growth value
+// GrowthStage returns the growth stage based on the current growth value.
 func (p *Plant) GrowthStage() string {
 	stages := []GrowthStage{Maturing, Growing, Sprouting, Seeding}
 	for _, stage := range stages {
@@ -82,6 +84,32 @@ func (p *Plant) GrowthStage() string {
 		}
 	}
 	return "dead"
+}
+
+// GrowthPercentage returns the plant's current growth as a percentage of full maturity (capped at 100%).
+func (p *Plant) GrowthPercentage() int {
+	maturingThreshold := growthStageThreshold[Maturing]
+	if maturingThreshold <= 0 {
+		return 0
+	}
+
+	percentage := (float64(p.Health.CurrentGrowth) / float64(maturingThreshold)) * 100
+	if percentage > 100 {
+		return 100
+	}
+	return int(percentage)
+}
+
+// DaysToMaturity estimates the number of days until the plant reaches maturity
+// based on its current growth and growth rate (0 if already mature)
+func (p *Plant) DaysToMaturity(t Variety) int {
+	if p.Health.CurrentGrowth >= growthStageThreshold[Maturing] {
+		return 0
+	}
+
+	remainingGrowth := growthStageThreshold[Maturing] - p.Health.CurrentGrowth
+	daysRemaining := float64(remainingGrowth) / float64(t.GrowthRate)
+	return int(math.Ceil(daysRemaining))
 }
 
 func (p *Plant) Image() string {
