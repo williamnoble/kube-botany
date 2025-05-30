@@ -27,7 +27,7 @@ func IntoPlantDTO(p *plant.Plant) PlantDTO {
 		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
 		DaysToMaturity:    p.DaysToMaturity(),
-		CurrentWaterLevel: p.WaterLevel(),
+		CurrentWaterLevel: p.CurrentWaterLevel(),
 		GrowthStage:       p.GrowthStage(),
 		Image:             fmt.Sprintf("/static/images/%s", p.Image()),
 	}
@@ -42,7 +42,7 @@ func FromPlantDTO(p *plant.Plant) PlantDTO {
 		FriendlyName:      p.FriendlyName,
 		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
-		CurrentWaterLevel: p.WaterLevel(),
+		CurrentWaterLevel: p.CurrentWaterLevel(),
 		GrowthStage:       p.GrowthStage(),
 	}
 	return r

@@ -140,9 +140,11 @@ func (p *Plant) AddWater() int {
 	return amountAdded
 }
 
-func (p *Plant) WaterLevel() int {
+func (p *Plant) CurrentWaterLevel() int {
 	return p.Health.CurrentWaterLevel
 }
+
+func (p *Plant) CurrentGrowth() int64 { return p.Health.CurrentGrowth }
 
 func (p *Plant) Validate() error {
 	// TODO, implement Zod or Zog? I forgot

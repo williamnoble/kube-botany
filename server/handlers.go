@@ -67,7 +67,7 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 	message := "plant is fully watered and cannot be watered anymore."
 	unitsAdded := p.AddWater()
 	if unitsAdded > 0 {
-		message = fmt.Sprintf("added %d units of water to %s (%d%% watered).", unitsAdded, p.NamespacedName, p.WaterLevel())
+		message = fmt.Sprintf("added %d units of water to %s (%d%% watered).", unitsAdded, p.NamespacedName, p.CurrentWaterLevel())
 	}
 
 	response := WaterResponse{
