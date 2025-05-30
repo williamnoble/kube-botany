@@ -22,9 +22,3 @@ var growthStageThreshold = map[GrowthStage]int64{
 	Growing:   150, // growthRate(5) => 30-50 days
 	Maturing:  250, // growthRate(5) => 50 days+
 }
-
-var healthThreshold = map[int64]string{
-	20: "Wilting/drooping plant",
-	60: "Normal healthy appearance",
-	80: "Vibrant, thriving appearance",
-}

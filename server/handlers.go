@@ -12,12 +12,6 @@ import (
 func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
 	var plants []types.PlantDTO
 	for _, currentPlant := range s.store.ListAllPlants() {
-		// TODO: this was a hack if it doesn't work fix the initial state!, I guess this might've been
-		// to derive the growth stage in which case it's fixed.
-		//err := s.store.UpdatePlantById(p.NamespacedName)
-		//if err != nil {
-		//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		//}
 		plantDTO := types.IntoPlantDTO(currentPlant)
 		plants = append(plants, plantDTO)
 	}
@@ -40,6 +34,23 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
 	}
+}
+
+func (s *Server) HandleGetPlantAscii(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	p, err := s.store.GetPlant(id)
+	var text string
+
+	text += s.renderer.RenderText(p)
+	if err != nil {
+		http.Error(w, "Plant not found", http.StatusNotFound)
+	}
+	w.Header().Set("Content-Variety", "text/plain; charset=utf-8")
+	_, err = w.Write([]byte(text))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 }
 
 // HandlePlantDelete deletes a plant by ID
@@ -136,7 +147,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := s.store.NewPlant(
+	_, err = s.store.NewPlant(
 		dto.NamespacedName,
 		dto.FriendlyName,
 		dto.Variety,
@@ -148,7 +159,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.plants = append(s.plants, p)
+	//s.plants = append(s.plants, p)
 	w.WriteHeader(http.StatusCreated)
 
 }
@@ -162,11 +173,3 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 //	w.WriteHeader(http.StatusOK)
 //	w.Write([]byte(asciiArt))
 //}
-
-func humanDate(t time.Time) string {
-	if t.IsZero() {
-		return ""
-	}
-
-	return t.UTC().Format("02 Jan 2006 at 15:04")
-}

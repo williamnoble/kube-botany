@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/render"
 	"github.com/williamnoble/kube-botany/repository/store"
 	"html/template"
 	"log/slog"
@@ -26,7 +27,7 @@ type Server struct {
 	store  store.PlantRepository
 	plants []*plant.Plant // Collection of plants managed by the httpServer
 
-	//renderer *render.ASCIIRenderer // Renderer for ASCII art
+	renderer *render.ASCIIRenderer // Renderer for ASCII art
 
 	httpServer *http.Server
 }
@@ -51,6 +52,7 @@ func NewServer(populateStore bool) (*Server, error) {
 		staticDir:    "static",
 		templatesDir: "static/templates",
 		store:        inMemoryStore,
+		renderer:     render.NewASCIIRenderer(),
 	}
 	s.ParseTemplates()
 
