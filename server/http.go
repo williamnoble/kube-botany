@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/williamnoble/kube-botany/types"
 	"net/http"
 )
 
@@ -31,4 +32,15 @@ func (s *Server) decodeJsonResponse(r *http.Request, v interface{}) error {
 		return fmt.Errorf("decodeJsonResponse json: %w", err)
 	}
 	return nil
+}
+
+// WaterResponse is the response returned by the water endpoint
+type WaterResponse struct {
+	Message string         `json:"message"` // Message about the watering result
+	Plant   types.PlantDTO // Updated plant information
+}
+
+// WaterRequest contains the NamespacedName identifier of the plant being watered
+type WaterRequest struct {
+	NamespacedName string `json:"namespaced_name"` // ID of the plant to water
 }

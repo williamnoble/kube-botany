@@ -1,4 +1,4 @@
-package server
+package types
 
 import (
 	"fmt"
@@ -20,8 +20,8 @@ type PlantDTO struct {
 	Image string `json:"image,omitempty"` // Path to the plant's image
 }
 
-// intoPlantDTO converts a plant.Plant to a PlantDTO for API responses and UI rendering
-func (s *Server) intoPlantDTO(p *plant.Plant) PlantDTO {
+// IntoPlantDTO converts a plant.Plant to a PlantDTO for API responses and UI rendering
+func IntoPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		NamespacedName:    p.NamespacedName,
 		FriendlyName:      p.FriendlyName,
@@ -36,8 +36,8 @@ func (s *Server) intoPlantDTO(p *plant.Plant) PlantDTO {
 	return r
 }
 
-// fromPlantDTO converts from PlantDTO to *plant.Plant for API responses and UI rendering
-func (s *Server) fromPlantDTO(p *plant.Plant) PlantDTO {
+// FromPlantDTO converts from PlantDTO to *plant.Plant for API responses and UI rendering
+func FromPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		NamespacedName:    p.NamespacedName,
 		FriendlyName:      p.FriendlyName,
@@ -47,17 +47,5 @@ func (s *Server) fromPlantDTO(p *plant.Plant) PlantDTO {
 		CurrentWaterLevel: p.WaterLevel(),
 		GrowthStage:       p.GrowthStage(),
 	}
-
 	return r
-}
-
-// WaterResponse is the response returned by the water endpoint
-type WaterResponse struct {
-	Message string   `json:"message"` // Message about the watering result
-	Plant   PlantDTO // Updated plant information
-}
-
-// WaterRequest contains the NamespacedName identifier of the plant being watered
-type WaterRequest struct {
-	NamespacedName string `json:"namespaced_name"` // ID of the plant to water
 }

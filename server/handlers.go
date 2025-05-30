@@ -3,13 +3,14 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/williamnoble/kube-botany/types"
 	"net/http"
 	"time"
 )
 
 // HandleListPlants returns a list of all plants as JSON
 func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
-	var plants []PlantDTO
+	var plants []types.PlantDTO
 	for _, currentPlant := range s.store.ListAllPlants() {
 		// TODO: this was a hack if it doesn't work fix the initial state!, I guess this might've been
 		// to derive the growth stage in which case it's fixed.
@@ -17,7 +18,7 @@ func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
 		//if err != nil {
 		//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		//}
-		plantDTO := s.intoPlantDTO(currentPlant)
+		plantDTO := types.IntoPlantDTO(currentPlant)
 		plants = append(plants, plantDTO)
 	}
 	fmt.Printf("All plants: %+v\n", plants)
@@ -34,7 +35,7 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
 	}
-	plantDTO := s.intoPlantDTO(p)
+	plantDTO := types.IntoPlantDTO(p)
 	err = s.encodeJsonResponse(w, r, http.StatusOK, plantDTO)
 	if err != nil {
 		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
@@ -71,7 +72,7 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 
 	response := WaterResponse{
 		Message: message,
-		Plant:   s.intoPlantDTO(p),
+		Plant:   types.IntoPlantDTO(p),
 	}
 
 	err = s.encodeJsonResponse(w, r, http.StatusOK, response)
@@ -83,10 +84,10 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 // HandleRenderHomePage renders the home page with cards for all plants
 // It converts each plant to a DTO, sets the image path, and renders the index.html template
 func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
-	var data []PlantDTO
+	var data []types.PlantDTO
 	plants := s.store.ListAllPlants()
 	for _, plant := range plants {
-		dto := s.intoPlantDTO(plant)
+		dto := types.IntoPlantDTO(plant)
 		//dto.Image = fmt.Sprintf("/static/images/%s", plant.Image())
 		fmt.Println("looking for image: ", plant.Image(), dto.Image)
 		if dto.FriendlyName == "" {
@@ -115,7 +116,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	plantDTO := s.intoPlantDTO(p)
+	plantDTO := types.IntoPlantDTO(p)
 	//plantDTO.Image = fmt.Sprintf("/static/images/%s", p.Image())
 	if plantDTO.FriendlyName == "" {
 		plantDTO.FriendlyName = plantDTO.NamespacedName
@@ -129,7 +130,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
-	var dto PlantDTO
+	var dto types.PlantDTO
 	err := s.decodeJsonResponse(r, &dto)
 	if err != nil {
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
