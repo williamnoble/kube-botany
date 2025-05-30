@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-var (
-	MinimumWaterLevel = 20
-)
-
 type Generator struct {
 	Backdrop string
 	Mascot   string
@@ -146,6 +142,10 @@ func (p *Plant) CurrentWaterLevel() int {
 
 func (p *Plant) CurrentGrowth() int64 { return p.Health.CurrentGrowth }
 
+func (p *Plant) Healthy() bool {
+	return p.CurrentWaterLevel() >= p.Variety.MinimumWaterLevel
+}
+
 func (p *Plant) Validate() error {
 	// TODO, implement Zod or Zog? I forgot
 	return nil
@@ -167,7 +167,7 @@ func (p *Plant) RenderGrowthStage(stage GrowthStage) UIGrowthStage {
 		Growing: {
 			Stage:       Growing,
 			ColorClass:  "green",
-			TooltipText: "Your plant is in active growth. Ensure proper watering and light is essential.",
+			TooltipText: "Your plant is in active growth. Ensuring proper watering is essential.",
 		},
 		Maturing: {
 			Stage:       Maturing,
