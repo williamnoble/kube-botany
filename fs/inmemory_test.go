@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestInMemory(t *testing.T) {
+func TestInMemoryStore(t *testing.T) {
 	store := NewInMemoryStore()
 
 	const fakeKey = "fake-key"
@@ -16,7 +16,7 @@ func TestInMemory(t *testing.T) {
 	}{
 		key:       "test-key",
 		fileName:  "test-img.jpeg",
-		imageData: []byte("fake-image-data"),
+		imageData: []byte("fake-image-images"),
 	}
 
 	assert.Equal(t, len(store.List()), 0)
