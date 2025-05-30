@@ -37,8 +37,6 @@ func VarietiesFromJson() (Varieties, error) {
 	// we store a pointer to Variety in the Plant type, for ease
 	// create a copy of the key and store in type
 	for variety, props := range varieties {
-		fmt.Printf("variety: %v\n", variety)
-		fmt.Printf("props: %v\n", props)
 		props.Type = variety
 		varieties[variety] = props
 	}
