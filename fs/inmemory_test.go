@@ -6,7 +6,7 @@ import (
 )
 
 func TestInMemoryStore(t *testing.T) {
-	store := NewInMemoryStore()
+	store := NewInMemoryImageStore()
 
 	const fakeKey = "fake-key"
 	testData := struct {

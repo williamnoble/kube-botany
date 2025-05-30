@@ -26,18 +26,18 @@ type ImageMetadata struct {
 	image    []byte
 }
 
-type InMemoryStore struct {
+type InMemoryImageStore struct {
 	images map[string][]ImageMetadata
 	mu     sync.RWMutex
 }
 
-func NewInMemoryStore() ImageStore {
-	return &InMemoryStore{
+func NewInMemoryImageStore() ImageStore {
+	return &InMemoryImageStore{
 		images: make(map[string][]ImageMetadata),
 	}
 }
 
-func (s *InMemoryStore) GetImage(key, fileName string) (*ImageMetadata, error) {
+func (s *InMemoryImageStore) GetImage(key, fileName string) (*ImageMetadata, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	images, exists := s.images[key]
@@ -52,7 +52,7 @@ func (s *InMemoryStore) GetImage(key, fileName string) (*ImageMetadata, error) {
 	return nil, ErrImageNotFound
 }
 
-func (s *InMemoryStore) SaveImage(key string, fileName string, imageData []byte) {
+func (s *InMemoryImageStore) SaveImage(key string, fileName string, imageData []byte) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	image := ImageMetadata{
@@ -62,7 +62,7 @@ func (s *InMemoryStore) SaveImage(key string, fileName string, imageData []byte)
 	s.images[key] = append(s.images[key], image)
 }
 
-func (s *InMemoryStore) DeleteImage(key, fileName string) error {
+func (s *InMemoryImageStore) DeleteImage(key, fileName string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -82,7 +82,7 @@ func (s *InMemoryStore) DeleteImage(key, fileName string) error {
 	return ErrImageNotFound
 }
 
-func (s *InMemoryStore) DeleteKey(key string) bool {
+func (s *InMemoryImageStore) DeleteKey(key string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -93,7 +93,7 @@ func (s *InMemoryStore) DeleteKey(key string) bool {
 	return false
 }
 
-func (s *InMemoryStore) GetImagesForKey(key string) ([]ImageMetadata, bool) {
+func (s *InMemoryImageStore) GetImagesForKey(key string) ([]ImageMetadata, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -101,7 +101,7 @@ func (s *InMemoryStore) GetImagesForKey(key string) ([]ImageMetadata, bool) {
 	return images, exists
 }
 
-func (s *InMemoryStore) List() []string {
+func (s *InMemoryImageStore) List() []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -112,7 +112,7 @@ func (s *InMemoryStore) List() []string {
 	return keys
 }
 
-func (s *InMemoryStore) CountByKey(key string) int {
+func (s *InMemoryImageStore) CountByKey(key string) int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -122,7 +122,7 @@ func (s *InMemoryStore) CountByKey(key string) int {
 	return 0
 }
 
-func (s *InMemoryStore) Clear() {
+func (s *InMemoryImageStore) Clear() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.images = make(map[string][]ImageMetadata)

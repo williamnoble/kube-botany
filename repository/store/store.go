@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"github.com/williamnoble/kube-botany/fs"
 	"github.com/williamnoble/kube-botany/plant"
 	"maps"
 	"path/filepath"
@@ -46,6 +47,7 @@ type InMemoryStore struct {
 	Plants          map[string]*plant.Plant
 	PlantsByVariety map[string][]string
 	Varieties       plant.Varieties
+	ImageStore      fs.ImageStore
 }
 
 func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
@@ -59,6 +61,7 @@ func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
 		Plants:          make(map[string]*plant.Plant),
 		Varieties:       props,
 		PlantsByVariety: make(map[string][]string),
+		ImageStore:      fs.NewInMemoryImageStore(),
 	}
 
 	if populateStore {
