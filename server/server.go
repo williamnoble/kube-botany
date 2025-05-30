@@ -39,7 +39,6 @@ func NewServer(populateStore bool) (*Server, error) {
 	})
 	logger := slog.New(logHandler)
 	inMemoryStore, err := store.NewInMemoryStore(populateStore)
-	fmt.Printf("Created new store: %v\n", inMemoryStore)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
 	}
@@ -64,7 +63,7 @@ func (s *Server) Start(port int) error {
 	mux := s.Routes()
 	addr := fmt.Sprintf(":%d", port)
 
-	s.Logger.Info("starting server", "addr", addr)
+	s.Logger.With("component", "server").Info("server", "listening on", addr)
 
 	s.httpServer = &http.Server{
 		Addr:         addr,

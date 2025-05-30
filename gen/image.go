@@ -39,7 +39,7 @@ func NewMockImageGenerationService(
 		logger:    logger,
 	}
 	s.generator = s.GenerateMockImage
-	s.logger.Info("configured mock image generation service")
+	s.logger.With("component", "generator").Info("configured mock image generation service")
 
 	return &s
 }
@@ -53,14 +53,14 @@ func (s *ImageGenerationService) ImageTask(plants map[string]*plant.Plant) error
 		_, err := os.Stat(plantImagePath)
 
 		if os.IsNotExist(err) {
-			s.logger.Info("generating missing image", "image", plantImageName)
+			s.logger.With("component", "generator").Info("generating missing image", "image", plantImageName)
 			err := s.generator(plantImageName)
 			if err != nil {
-				s.logger.Error("image generation failed", "image", plantImageName, "error", err.Error())
+				s.logger.With("component", "generator").Error("image generation failed", "image", plantImageName, "error", err.Error())
 				errs = append(errs, fmt.Errorf("failed to generate image %s: %w", plantImageName, err))
 				continue
 			}
-			s.logger.Info("image generated successfully", "image", plantImageName)
+			s.logger.With("component", "generator").Info("image generated successfully", "image", plantImageName)
 		} else if err != nil {
 			s.logger.Error("failed to check if image exists", "image", plantImageName, "error", err.Error())
 			errs = append(errs, fmt.Errorf("failed to check image %s: %w", plantImageName, err))
