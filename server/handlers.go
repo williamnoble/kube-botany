@@ -65,7 +65,7 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 	}
 
 	message := "plant is fully watered and cannot be watered anymore."
-	unitsAdded := p.AddWater(time.Now())
+	unitsAdded := p.AddWater()
 	if unitsAdded > 0 {
 		message = fmt.Sprintf("added %d units of water to %s (%d%% watered).", unitsAdded, p.NamespacedName, p.WaterLevel())
 	}
@@ -117,7 +117,6 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	plantDTO := types.IntoPlantDTO(p)
-	//plantDTO.Image = fmt.Sprintf("/static/images/%s", p.Image())
 	if plantDTO.FriendlyName == "" {
 		plantDTO.FriendlyName = plantDTO.NamespacedName
 	}

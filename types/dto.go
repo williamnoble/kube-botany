@@ -3,30 +3,28 @@ package types
 import (
 	"fmt"
 	"github.com/williamnoble/kube-botany/plant"
-	"time"
 )
 
 // PlantDTO represents a plant in API responses and UI rendering
 type PlantDTO struct {
-	NamespacedName string `json:"namespaced_name"` // Unique identifier for the plant
-	FriendlyName   string `json:"friendly_name"`   // Display name for the plant
-	Variety        string `json:"variety"`         // Variety of plant (e.g., bonsai, sunflower)
-
-	Age               string `json:"age"`                  // Age of the plant as a formatted string
+	NamespacedName    string `json:"namespaced_name"`      // Unique identifier for the plant
+	FriendlyName      string `json:"friendly_name"`        // Display name for the plant
+	Variety           string `json:"variety"`              // Variety of plant (e.g., bonsai, sunflower)
 	DaysAlive         int    `json:"days_alive,omitempty"` // Number of days the plant has been alive
-	CurrentWaterLevel int    `json:"current_water_level"`  // The current water level
-	GrowthStage       string `json:"growth_stage"`         // Derives growth stage from current growth
+	DaysToMaturity    int    `json:"days_to_maturity,omitempty"`
+	CurrentWaterLevel int    `json:"current_water_level"` // The current water level
+	GrowthStage       string `json:"growth_stage"`        // Derives growth stage from current growth
 
 	Image string `json:"image,omitempty"` // Path to the plant's image
 }
 
 // IntoPlantDTO converts a plant.Plant to a PlantDTO for API responses and UI rendering
 func IntoPlantDTO(p *plant.Plant) PlantDTO {
+
 	r := PlantDTO{
-		NamespacedName:    p.NamespacedName,
+		NamespacedName:    p.NamespacedName, // Unique ID
 		FriendlyName:      p.FriendlyName,
-		Variety:           p.Variety,
-		Age:               time.Since(p.CreationTime).Round(time.Second).String(),
+		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
 		CurrentWaterLevel: p.WaterLevel(),
 		GrowthStage:       p.GrowthStage(),
@@ -41,8 +39,7 @@ func FromPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		NamespacedName:    p.NamespacedName,
 		FriendlyName:      p.FriendlyName,
-		Variety:           p.Variety,
-		Age:               time.Since(p.CreationTime).Round(time.Second).String(),
+		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
 		CurrentWaterLevel: p.WaterLevel(),
 		GrowthStage:       p.GrowthStage(),

@@ -31,8 +31,8 @@ type PlantRepository interface {
 	// UpdatePlantById Updates a specific plant's state
 	UpdatePlantById(namespacedName string) error
 
-	// LookupType Get plant type characteristics
-	LookupType(plantType string) (plant.Variety, error)
+	// GetVariety Get plant type characteristics
+	GetVariety(plantType string) (plant.Variety, error)
 
 	// ListSupportedVarieties lists the types of plant variety supported by the backend
 	ListSupportedVarieties() []string
@@ -69,28 +69,22 @@ func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
 func (s *InMemoryStore) NewPlant(
 	namespacedName string,
 	friendlyName string,
-	plantType string,
+	varietyType string,
 	creationTime time.Time) (*plant.Plant, error) {
-	// Provie a Random CurrentGrowth Rate, our plant requires 1000 CurrentGrowth to reach maturity. Hence,
-	// We divide 1000 by the number of days required to reach maturity.
-	// minDaysToMaturity = 28 // 4 weeks
-	// maxDaysToMaturity = 42 // 6 weeks
-	// Random days to maturity between min and max
-	// daysToMaturity = rand.Intn(maxDaysToMaturity-minDaysToMaturity+1) + minDaysToMaturity
-	// Calculate daily growth rate
-	// growthRate = int64(1000 / daysToMaturity)
-	//WaterConsumptionRatePerDay: rand.Intn(6) + 2,
 	health := plant.Health{
-
 		CurrentGrowth:     0,
 		CurrentWaterLevel: 50, // 50% watered
-		LastWatered:       time.Now(),
+	}
+
+	variety, err := s.GetVariety(varietyType)
+	if err != nil {
+		return nil, err
 	}
 
 	p := &plant.Plant{
 		NamespacedName: namespacedName,
 		FriendlyName:   friendlyName,
-		Variety:        plantType,
+		Variety:        &variety,
 		CreationTime:   creationTime,
 		LastUpdated:    creationTime,
 		Health:         health,
@@ -101,7 +95,7 @@ func (s *InMemoryStore) NewPlant(
 	}
 
 	s.Plants[namespacedName] = p
-	s.PlantsByVariety[plantType] = append(s.PlantsByVariety[plantType], namespacedName)
+	s.PlantsByVariety[varietyType] = append(s.PlantsByVariety[varietyType], namespacedName)
 
 	return p, nil
 }
@@ -118,11 +112,7 @@ func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
 func (s *InMemoryStore) UpdatePlantById(namespacedName string) error {
 	for id, p := range s.Plants {
 		if id == namespacedName {
-			t, err := s.LookupType(p.Variety)
-			if err != nil {
-				return fmt.Errorf("failed to update plant: %w", err)
-			}
-			p.Update(time.Now(), t)
+			p.Update(time.Now())
 			return nil
 		}
 	}
@@ -137,8 +127,8 @@ func (s *InMemoryStore) DeletePlant(id string) error {
 
 	delete(s.Plants, id)
 
-	if typeIDs, ok := s.PlantsByVariety[p.Variety]; ok {
-		s.PlantsByVariety[p.Variety] = slices.DeleteFunc(typeIDs, func(plantID string) bool {
+	if typeIDs, ok := s.PlantsByVariety[p.Variety.Type]; ok {
+		s.PlantsByVariety[p.Variety.Type] = slices.DeleteFunc(typeIDs, func(plantID string) bool {
 			return plantID == id
 		})
 	}
@@ -176,8 +166,8 @@ func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
 	return nil
 }
 
-func (s *InMemoryStore) LookupType(plantType string) (plant.Variety, error) {
-	v, ok := s.Varieties[plantType]
+func (s *InMemoryStore) GetVariety(variety string) (plant.Variety, error) {
+	v, ok := s.Varieties[variety]
 	if !ok {
 		return plant.Variety{}, errors.New("plant type not found")
 	}

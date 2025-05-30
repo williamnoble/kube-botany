@@ -3,7 +3,6 @@ package plant
 import (
 	"fmt"
 	"math"
-	"math/rand"
 	"time"
 )
 
@@ -20,70 +19,73 @@ type Health struct {
 	// Health State (config-map?)
 	CurrentGrowth     int64
 	CurrentWaterLevel int
-	LastWatered       time.Time   // TODO: can we remove this? perhaps compute on a 24 hour basis as a bg task.
-	GrowthStage       GrowthStage // TODO: this can be computed to avoid storing in the struct
 }
 
 type Plant struct {
 	NamespacedName string
 	FriendlyName   string
-	Variety        string
+	Variety        *Variety
 	CreationTime   time.Time
-	LastUpdated    time.Time // TODO: I think we can deprecate LastWatered and retain LastUpdated, or remove both...
+	LastUpdated    time.Time
 
 	Health Health
 }
 
 // Update progresses the plant state based on elapsed time
 // Water consumption is calculated, assuming the plant is appropriated watered, it grows.
-func (p *Plant) Update(currentTime time.Time, t Variety) {
-	p.updateWaterConsumption(currentTime, t)
-	if p.Health.CurrentWaterLevel > MinimumWaterLevel {
-		p.updateGrowth(currentTime, t)
-	} else {
-		p.LastUpdated = currentTime
-	}
+func (p *Plant) Update(currentTime time.Time) {
+	p.updateWaterConsumption(currentTime)
+	p.updateGrowth(currentTime)
+	p.LastUpdated = currentTime
 }
 
 // updateWaterConsumption calculates and applies water consumption since the last update.
-func (p *Plant) updateWaterConsumption(currentTime time.Time, t Variety) {
-	// calculate elapsed time in days, since the last update
-	elapsed := currentTime.Sub(p.LastUpdated)
-	days := elapsed.Hours() / 24
+func (p *Plant) updateWaterConsumption(currentTime time.Time) {
+	// calculate elapsed time (days), since the last update
+	elapsedDays := elapsedDays(currentTime, p.LastUpdated)
+	//elapsed := currentTime.Sub(p.LastUpdated)
+	//days := elapsed.Hours() / 24
 
 	//  determining water consumed based on the consumption rate of a particular variety of plant.
-	waterConsumed := int(float64(t.WaterConsumptionUnits) * days)
+	waterConsumed := int(float64(p.Variety.WaterConsumptionUnitsPerDay) * elapsedDays)
 
 	// reducing the current water level, (bounded at zero).
 	p.Health.CurrentWaterLevel -= waterConsumed
 	if p.Health.CurrentWaterLevel < 0 {
 		p.Health.CurrentWaterLevel = 0
 	}
+}
 
+func elapsedDays(currentTime time.Time, lastUpdatedTime time.Time) float64 {
+	elapsed := currentTime.Sub(lastUpdatedTime)
+	days := elapsed.Hours() / 24
+	return days
 }
 
 // updateGrowth calculates and applies growth progress since the last update.
-func (p *Plant) updateGrowth(currentTime time.Time, t Variety) {
-	elapsed := currentTime.Sub(p.LastUpdated)
-	days := elapsed.Hours() / 24
+func (p *Plant) updateGrowth(currentTime time.Time) {
+	// calculate elapsed time (days), since the last update
+	//elapsed := currentTime.Sub(p.LastUpdated)
+	//days := elapsed.Hours() / 24
+	elapsedDays := elapsedDays(currentTime, p.LastUpdated)
 
-	// Growth is determined solely by the elapsed time and the plant's growth rate.
-	// The growth accumulates in CurrentGrowth, which is used to determine the
+	// growth is determined solely by the elapsed time and the plant's growth rate.
+	// the growth accumulates in CurrentGrowth, which is used to determine the
 	// plant's growth stage.
-	growth := float64(t.GrowthRate) * days
+	growth := float64(p.Variety.GrowthRatePerDay) * elapsedDays
 	p.Health.CurrentGrowth += int64(math.Round(growth))
-	p.LastUpdated = currentTime
 }
 
 // GrowthStage returns the growth stage based on the current growth value.
 func (p *Plant) GrowthStage() string {
+	// maps.Keys() is non-deterministic so we'll hardcode
 	stages := []GrowthStage{Maturing, Growing, Sprouting, Seeding}
 	for _, stage := range stages {
 		if p.Health.CurrentGrowth >= growthStageThreshold[stage] {
 			return stage.String()
 		}
 	}
-	return "dead"
+	return Seeding.String()
 }
 
 // GrowthPercentage returns the plant's current growth as a percentage of full maturity (capped at 100%).
@@ -102,13 +104,13 @@ func (p *Plant) GrowthPercentage() int {
 
 // DaysToMaturity estimates the number of days until the plant reaches maturity
 // based on its current growth and growth rate (0 if already mature)
-func (p *Plant) DaysToMaturity(t Variety) int {
+func (p *Plant) DaysToMaturity() int {
 	if p.Health.CurrentGrowth >= growthStageThreshold[Maturing] {
 		return 0
 	}
 
 	remainingGrowth := growthStageThreshold[Maturing] - p.Health.CurrentGrowth
-	daysRemaining := float64(remainingGrowth) / float64(t.GrowthRate)
+	daysRemaining := float64(remainingGrowth) / float64(p.Variety.GrowthRatePerDay)
 	return int(math.Ceil(daysRemaining))
 }
 
@@ -131,22 +133,11 @@ func (p *Plant) DaysAlive() int {
 	return int(days)
 }
 
-// AddWater adds 1-5% water to the plant (up to 100%)
-func (p *Plant) AddWater(t time.Time) int {
-	// Random water increment between 1% and 5%
-	var waterIncrement = rand.Intn(5) + 1
-
-	// Add water (capped at 100%)
-	actualToAdd := waterIncrement
-	if p.Health.CurrentWaterLevel+waterIncrement > 100 {
-		actualToAdd = 100 - p.Health.CurrentWaterLevel
-	}
-	p.Health.CurrentWaterLevel += actualToAdd
-
-	// We need to know when la
-	p.Health.LastWatered = t
-
-	return actualToAdd
+// AddWater fully waters the plant
+func (p *Plant) AddWater() int {
+	amountAdded := 100 - p.Health.CurrentWaterLevel
+	p.Health.CurrentWaterLevel = 100
+	return amountAdded
 }
 
 func (p *Plant) WaterLevel() int {

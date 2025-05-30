@@ -173,7 +173,7 @@ package plant
 //	creationTime := time.Now()
 //	p := NewPlant("DefaultBonsai123", "My Bonsai", "bonsai", creationTime, false)
 //	p.WaterLevel = 100 // Optimal water level
-//	p.GrowthRate = 10
+//	p.GrowthRatePerDay = 10
 //
 //	threeDay := creationTime.Add(72 * time.Hour) // 3 days later
 //	p.updateGrowth(threeDay)
@@ -188,7 +188,7 @@ package plant
 //	creationTime := time.Now()
 //	p := NewPlant("DefaultBonsai123", "My Bonsai", "bonsai", creationTime, false)
 //	p.WaterLevel = 25 // 50% growth rate (25/50)
-//	p.GrowthRate = 10 // Fixed rate for testing
+//	p.GrowthRatePerDay = 10 // Fixed rate for testing
 //
 //	twoDay := creationTime.Add(48 * time.Hour) // 2 days later
 //	p.updateGrowth(twoDay)
@@ -224,7 +224,7 @@ package plant
 //	p := NewPlant("test", "My Bonsai", "bonsai", creationTime, false)
 //	p.WaterLevel = 60
 //	p.WaterConsumptionRatePerDay = 5
-//	p.GrowthRate = 20
+//	p.GrowthRatePerDay = 20
 //
 //	// Action - 2 days later
 //	twoDay := creationTime.Add(48 * time.Hour)

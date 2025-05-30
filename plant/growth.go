@@ -21,7 +21,6 @@ var growthStageThreshold = map[GrowthStage]int64{
 	Sprouting: 50,  // growthRate(5) => 10-30 days
 	Growing:   150, // growthRate(5) => 30-50 days
 	Maturing:  250, // growthRate(5) => 50 days+
-	Dead:      -1,
 }
 
 var healthThreshold = map[int64]string{
