@@ -56,8 +56,8 @@ func TestUpdateWaterConsumption(t *testing.T) {
 	secondDay := currentTime.Add(24 * time.Hour * 2)
 	p.Update(secondDay)
 
-	// bonsai consumes 1 unit of water per day or 2 units in two days
-	assert.Equal(t, 48, p.CurrentWaterLevel())
+	// bonsai consumes 2 units of water per day or 4 units in two days
+	assert.Equal(t, 46, p.CurrentWaterLevel())
 }
 
 func TestUpdateGrowth(t *testing.T) {

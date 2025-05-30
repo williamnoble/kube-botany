@@ -1,12 +1,32 @@
 {
+  "aloe_vera": {
+    "growth_rate": 6,
+    "minimum_water_level": 15,
+    "water_consumption": 2
+  },
+  "bamboo": {
+    "growth_rate": 15,
+    "minimum_water_level": 40,
+    "water_consumption": 8
+  },
   "bonsai": {
-    "growth_rate":  5,
-    "water_consumption": 1,
-    "minimum_water_level": 5
+    "growth_rate": 5,
+    "minimum_water_level": 10,
+    "water_consumption": 2
+  },
+  "cactus": {
+    "growth_rate": 2,
+    "minimum_water_level": 5,
+    "water_consumption": 1
+  },
+  "orchid": {
+    "growth_rate": 4,
+    "minimum_water_level": 25,
+    "water_consumption": 3
   },
   "sunflower": {
-    "growth_rate":  10,
-    "water_consumption": 6,
-    "minimum_water_level": 20
+    "growth_rate": 10,
+    "minimum_water_level": 50,
+    "water_consumption": 6
   }
 }
