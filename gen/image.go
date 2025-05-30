@@ -17,8 +17,8 @@ import (
 type ImageGeneratorFunction func(plant string) error
 
 type ImageGenerationService struct {
-	logger    *slog.Logger
 	staticDir string
+	logger    *slog.Logger
 	generator ImageGeneratorFunction
 }
 
@@ -84,7 +84,7 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 
 	image, err := client.Images.Generate(ctx, openai.ImageGenerateParams{
 		Prompt:         prompt,
-		Model:          openai.ImageModelDallE3,
+		Model:          openai.ImageModelGPTImage1,
 		ResponseFormat: openai.ImageGenerateParamsResponseFormatB64JSON,
 		N:              openai.Int(1),
 	})
