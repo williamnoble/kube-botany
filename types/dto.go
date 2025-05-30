@@ -26,6 +26,7 @@ func IntoPlantDTO(p *plant.Plant) PlantDTO {
 		FriendlyName:      p.FriendlyName,
 		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
+		DaysToMaturity:    p.DaysToMaturity(),
 		CurrentWaterLevel: p.WaterLevel(),
 		GrowthStage:       p.GrowthStage(),
 		Image:             fmt.Sprintf("/static/images/%s", p.Image()),

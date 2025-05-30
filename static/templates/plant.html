@@ -5,6 +5,12 @@
         <!-- Image with natural dimensions and rounded corners -->
         <img src="{{.Image}}" alt="{{.FriendlyName}}" class="max-h-[80vh] object-contain rounded-2xl shadow-lg">
 
+        <!-- Days to maturity text - positioned at bottom left -->
+        <div class="absolute bottom-4 left-4 text-white bg-gray-800 bg-opacity-50 py-1 px-3 rounded-full text-sm">
+            {{.DaysToMaturity}} days until fully matured
+        </div>
+
+
         <!-- Buttons container at the bottom right -->
         <div class="absolute bottom-4 right-4 flex">
             <!-- Water drop button with tooltip -->
