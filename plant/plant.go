@@ -190,3 +190,7 @@ type UIGrowthStage struct {
 	ColorClass  string      // CSS class for styling
 	TooltipText string      // Text to display in a tooltip
 }
+
+func (p *Plant) HumanCreationTime() string {
+	return p.CreationTime.Format("02 Jan 2006 at 15:04")
+}

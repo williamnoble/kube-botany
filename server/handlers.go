@@ -15,10 +15,9 @@ func (s *Server) HandleListPlants(w http.ResponseWriter, r *http.Request) {
 		plantDTO := types.IntoPlantDTO(currentPlant)
 		plants = append(plants, plantDTO)
 	}
-	fmt.Printf("All plants: %+v\n", plants)
 	err := s.encodeJsonResponse(w, r, http.StatusOK, plants)
 	if err != nil {
-		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
+		s.InternalServerErrorResponse(w, err)
 	}
 }
 
@@ -32,7 +31,7 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	plantDTO := types.IntoPlantDTO(p)
 	err = s.encodeJsonResponse(w, r, http.StatusOK, plantDTO)
 	if err != nil {
-		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
+		s.InternalServerErrorResponse(w, err)
 	}
 }
 
@@ -40,7 +39,6 @@ func (s *Server) HandleGetPlantAscii(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	p, err := s.store.GetPlant(id)
 	var text string
-
 	text += s.renderer.RenderText(p)
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
@@ -48,9 +46,8 @@ func (s *Server) HandleGetPlantAscii(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Variety", "text/plain; charset=utf-8")
 	_, err = w.Write([]byte(text))
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		s.InternalServerErrorResponse(w, err)
 	}
-
 }
 
 // HandlePlantDelete deletes a plant by ID
@@ -59,7 +56,7 @@ func (s *Server) HandlePlantDelete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	err := s.store.DeletePlant(id)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		s.InternalServerErrorResponse(w, err)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -68,7 +65,6 @@ func (s *Server) HandlePlantDelete(w http.ResponseWriter, r *http.Request) {
 // It accepts a JSON request with a plant ID, adds water to the plant, and returns a response with a message and the updated plant
 func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-
 	p, err := s.store.GetPlant(id)
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
@@ -88,7 +84,7 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 
 	err = s.encodeJsonResponse(w, r, http.StatusOK, response)
 	if err != nil {
-		http.Error(w, "Internal httpServer error", http.StatusInternalServerError)
+		s.InternalServerErrorResponse(w, err)
 	}
 }
 
@@ -99,8 +95,6 @@ func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
 	plants := s.store.ListAllPlants()
 	for _, plant := range plants {
 		dto := types.IntoPlantDTO(plant)
-		//dto.Image = fmt.Sprintf("/static/images/%s", plant.Image())
-		fmt.Println("looking for image: ", plant.Image(), dto.Image)
 		if dto.FriendlyName == "" {
 			dto.FriendlyName = dto.NamespacedName
 		}
@@ -163,13 +157,3 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
-
-//
-//func (s *Server) handleASCII(w http.ResponseWriter, r *http.Request) {
-//	currentPlant.Update(time.Now())
-//	currentPlant.GrowthStage = plant.Maturing
-//	asciiArt := s.renderer.RenderFern(currentPlant)
-//	w.Header().Set("Content-Variety", "text/plain; charset=utf-8")
-//	w.WriteHeader(http.StatusOK)
-//	w.Write([]byte(asciiArt))
-//}

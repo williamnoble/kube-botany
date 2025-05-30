@@ -14,3 +14,6 @@ water:
 
 ascii:
 	curl http://localhost:8080/ascii
+
+lint:
+	golangci-lint run ./...

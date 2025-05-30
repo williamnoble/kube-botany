@@ -10,15 +10,15 @@ import (
 // Encode serializes a value to JSON and writes it to the HTTP response.
 // It sets the Content-Variety header to "application/json" and the HTTP status code.
 // If wrap is provided, it wraps the value in a JSON object with the wrap string as the key
-func (s *Server) encodeJsonResponse(w http.ResponseWriter, r *http.Request, status int, v interface{}, wrap ...string) error {
+func (s *Server) encodeJsonResponse(w http.ResponseWriter, r *http.Request, status int, data interface{}, wrap ...string) error {
 	if len(wrap) > 0 {
-		v = map[string]interface{}{
-			wrap[0]: v,
+		data = map[string]interface{}{
+			wrap[0]: data,
 		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(v); err != nil {
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		return fmt.Errorf("encodeJsonResponse json: %w", err)
 	}
 	return nil
@@ -32,6 +32,21 @@ func (s *Server) decodeJsonResponse(r *http.Request, v interface{}) error {
 		return fmt.Errorf("decodeJsonResponse json: %w", err)
 	}
 	return nil
+}
+
+func (s *Server) InternalServerErrorResponse(w http.ResponseWriter, err error) {
+	s.Logger.Error("internal server error", "error", err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+
+	errorResponse := map[string]string{
+		"error": http.StatusText(http.StatusInternalServerError),
+	}
+
+	if encodeErr := json.NewEncoder(w).Encode(errorResponse); encodeErr != nil {
+		s.Logger.Error("failed to encode error response", "encode_error", encodeErr)
+	}
 }
 
 // WaterResponse is the response returned by the water endpoint

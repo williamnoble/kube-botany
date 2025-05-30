@@ -3,14 +3,12 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/williamnoble/kube-botany/plant"
 	"github.com/williamnoble/kube-botany/render"
 	"github.com/williamnoble/kube-botany/repository/store"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -23,9 +21,7 @@ type Server struct {
 	Logger    *slog.Logger // Logger for httpServer logs
 	startTime time.Time    // Time when the httpServer started
 
-	mu     sync.RWMutex // Mutex for thread-safe access to plants
-	store  store.PlantRepository
-	plants []*plant.Plant // Collection of plants managed by the httpServer
+	store store.PlantRepository
 
 	renderer *render.ASCIIRenderer // Renderer for ASCII art
 
@@ -33,7 +29,7 @@ type Server struct {
 }
 
 // NewServer creates a new httpServer instance with the given plants
-// It initializes the logger, renderer, templates, and other httpServer components
+// It initialises the logger, renderer, templates, and other httpServer components
 func NewServer(populateStore bool) (*Server, error) {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
@@ -45,9 +41,8 @@ func NewServer(populateStore bool) (*Server, error) {
 	}
 
 	s := &Server{
-		Logger:    logger,
-		startTime: time.Now(),
-		//renderer:     render.NewASCIIRenderer(),
+		Logger:       logger,
+		startTime:    time.Now(),
 		templates:    make(map[string]*template.Template),
 		staticDir:    "static",
 		templatesDir: "static/templates",
@@ -82,7 +77,7 @@ func (s *Server) Start(port int) error {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	if s.httpServer == nil {
-		s.Logger.Error("http server not started")
+		s.Logger.With("component", "server").Info("http server not started")
 		return nil
 	}
 

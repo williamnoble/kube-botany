@@ -8,6 +8,7 @@ import (
 	"maps"
 	"path/filepath"
 	"slices"
+	"sync"
 	"time"
 )
 
@@ -34,7 +35,7 @@ type PlantRepository interface {
 	UpdatePlantById(namespacedName string) error
 
 	// GetVariety Get plant type characteristics
-	GetVariety(plantType string) (plant.Variety, error)
+	GetVarietyUnsafe(plantType string) (plant.Variety, error)
 
 	// ListSupportedVarieties lists the types of plant variety supported by the backend
 	ListSupportedVarieties() []string
@@ -48,6 +49,7 @@ type InMemoryStore struct {
 	PlantsByVariety map[string][]string
 	Varieties       plant.Varieties
 	ImageStore      fs.ImageStore
+	mu              sync.RWMutex // Mutex for thread-safe access to plants
 }
 
 func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
@@ -81,7 +83,10 @@ func (s *InMemoryStore) NewPlant(
 		CurrentWaterLevel: 50, // 50% watered
 	}
 
-	variety, err := s.GetVariety(varietyType)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	variety, err := s.GetVarietyUnsafe(varietyType)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +111,9 @@ func (s *InMemoryStore) NewPlant(
 }
 
 func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	p, ok := s.Plants[id]
 	if !ok {
 		return nil, errors.New("plant not found")
@@ -115,6 +123,9 @@ func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
 }
 
 func (s *InMemoryStore) UpdatePlantById(namespacedName string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	for id, p := range s.Plants {
 		if id == namespacedName {
 			p.Update(time.Now())
@@ -125,6 +136,9 @@ func (s *InMemoryStore) UpdatePlantById(namespacedName string) error {
 }
 
 func (s *InMemoryStore) DeletePlant(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	p, err := s.GetPlant(id)
 	if err != nil {
 		return fmt.Errorf("failed to delete plant: %w", err)
@@ -143,6 +157,9 @@ func (s *InMemoryStore) DeletePlant(id string) error {
 }
 
 func (s *InMemoryStore) ListPlantsByType(plantType string) (map[string][]string, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	_, ok := s.PlantsByVariety[plantType]
 	if !ok {
 		return make(map[string][]string), errors.New("plant type not found")
@@ -151,10 +168,16 @@ func (s *InMemoryStore) ListPlantsByType(plantType string) (map[string][]string,
 }
 
 func (s *InMemoryStore) ListAllPlants() map[string]*plant.Plant {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.Plants
 }
 
 func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	var failedErrs []error
 
 	for _, namespacedName := range namespacedNames {
@@ -171,7 +194,7 @@ func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
 	return nil
 }
 
-func (s *InMemoryStore) GetVariety(variety string) (plant.Variety, error) {
+func (s *InMemoryStore) GetVarietyUnsafe(variety string) (plant.Variety, error) {
 	v, ok := s.Varieties[variety]
 	if !ok {
 		return plant.Variety{}, errors.New("plant type not found")
@@ -196,11 +219,17 @@ func (s *InMemoryStore) populateSamplePlants() {
 }
 
 func (s *InMemoryStore) ListSupportedVarieties() []string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	varieties := slices.Collect(maps.Keys(s.Varieties))
 	return varieties
 }
 
 func (s *InMemoryStore) Variety(variety string) (plant.Variety, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	if _, ok := s.Varieties[variety]; !ok {
 		return plant.Variety{}, errors.New("variety not found")
 	}

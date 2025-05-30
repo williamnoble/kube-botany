@@ -35,7 +35,7 @@ func main() {
 	defer cancel()
 
 	if err := svr.Shutdown(ctx); err != nil {
-		svr.Logger.With("component", "server").Error("graceful shutdown failed", err)
+		svr.Logger.With("component", "server").Error("graceful shutdown failed", "error", err)
 		panic(err)
 	}
 

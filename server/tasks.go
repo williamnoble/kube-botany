@@ -9,6 +9,7 @@ func (s *Server) BackgroundTasks() {
 	s.Logger.With("component", "tasks").Info("starting background tasks")
 
 	imgSvc := gen.NewMockImageGenerationService(s.staticDir, s.Logger)
+
 	// run the task once on startup
 	plants := s.store.ListAllPlants()
 	err := imgSvc.ImageTask(plants)
