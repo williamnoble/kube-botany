@@ -109,17 +109,19 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 
 func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	plantName := strings.Split(plant, "-")[3]
-	defaultBonsai := fmt.Sprintf("%s/images/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
-	destination := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
-	src, err := os.Open(defaultBonsai)
+	// remove default images from /images/ so they are in the commit history, but generated
+	// images are excluded from the commit history
+	sourcePlaceholderImg := fmt.Sprintf("%s/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
+	destinationImg := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
+	src, err := os.Open(sourcePlaceholderImg)
 	if err != nil {
 		return fmt.Errorf("error opening source file: %w", err)
 	}
 	defer src.Close()
 
-	dst, err := os.Create(destination)
+	dst, err := os.Create(destinationImg)
 	if err != nil {
-		return fmt.Errorf("error opening destination file: %w", err)
+		return fmt.Errorf("error opening destinationImg file: %w", err)
 	}
 
 	_, err = io.Copy(dst, src)
