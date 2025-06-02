@@ -36,6 +36,7 @@ func IntoPlantDTO(p *plant.Plant) PlantDTO {
 }
 
 // FromPlantDTO converts from PlantDTO to *plant.Plant for API responses and UI rendering
+// TODO: This uses the wrong types, fix when writing Operator
 func FromPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
 		NamespacedName:    p.NamespacedName,

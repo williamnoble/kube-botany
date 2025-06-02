@@ -64,6 +64,9 @@ func TestUpdateGrowth(t *testing.T) {
 	// growth is 0 when the plant is created
 	p, currentTime := testPlant(t)
 
+	// technically, day 0 is represented as day 1
+	assert.Equal(t, 1, p.DaysAlive())
+
 	// bonsai grows 5 units per day and 15 units in 3 days, it's still seeding
 	// it fully matures in 47 days, if this seems too long, pick a sunflower:)
 	dayThree := currentTime.Add(24 * time.Hour * 3)

@@ -14,15 +14,13 @@ import (
 
 // Server represents the HTTP httpServer for the plant application
 type Server struct {
-	staticDir    string                        // Directory for static assets
-	templatesDir string                        // Directory for HTML templates
-	templates    map[string]*template.Template // Parsed HTML templates
+	staticDir string                        // Directory for static assets
+	templates map[string]*template.Template // Parsed HTML templates
 
 	Logger    *slog.Logger // Logger for httpServer logs
 	startTime time.Time    // Time when the httpServer started
 
-	store store.PlantRepository
-
+	store    store.PlantRepository // Repository for plants
 	renderer *render.ASCIIRenderer // Renderer for ASCII art
 
 	httpServer *http.Server
@@ -41,13 +39,12 @@ func NewServer(populateStore bool) (*Server, error) {
 	}
 
 	s := &Server{
-		Logger:       logger,
-		startTime:    time.Now(),
-		templates:    make(map[string]*template.Template),
-		staticDir:    "static",
-		templatesDir: "static/templates",
-		store:        inMemoryStore,
-		renderer:     render.NewASCIIRenderer(),
+		Logger:    logger,
+		startTime: time.Now(),
+		templates: make(map[string]*template.Template),
+		staticDir: "static",
+		store:     inMemoryStore,
+		renderer:  render.NewASCIIRenderer(),
 	}
 	s.ParseTemplates()
 

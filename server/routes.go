@@ -29,9 +29,5 @@ func (s *Server) Routes() http.Handler {
 	r.HandleFunc("GET /", s.HandleRenderHomePage)  // GET / - Render home page with all plants
 	r.HandleFunc("GET /{id}", s.HandlePlantDetail) // GET /{id} - Render plant detail page
 
-	// Commented out routes for future implementation
-	//r.HandleFunc("POST /plant", s.handleNewPlant)
-	//r.HandleFunc("GET /ascii", s.handleASCII)
-
 	return r
 }
