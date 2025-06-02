@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-// Variety is the plant type. Ideally, we'd use `Variety` but similarity
-// to in-built is playing with fire:)
+// Variety contains some characterists for a given plant type e.g., a sunflower will grow quickly and high
+// water consumption level, whereas a bonsai will grow very slowly and have relatively low water consumption.
 type Variety struct {
 	GrowthRatePerDay            int64  `json:"growth_rate"`       // between 4-6 weeks at max growth
 	WaterConsumptionUnitsPerDay int64  `json:"water_consumption"` // 0-1 scale per day

@@ -13,8 +13,6 @@ func NewASCIIRenderer() *ASCIIRenderer {
 }
 
 func (r *ASCIIRenderer) RenderText(p *plant.Plant) string {
-	fmt.Println("rendering")
-
 	asciiArt := map[string]string{
 		"seeding":   seeding,
 		"sprouting": sprouting,
@@ -53,7 +51,6 @@ func renderBar(label string, value, max int) string {
 			bar += " "
 		}
 	}
-	// Fix format specifier to match the int type
 	bar += "] " + fmt.Sprintf("%d%%", value)
 	return bar
 }

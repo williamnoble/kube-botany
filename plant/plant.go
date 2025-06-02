@@ -116,7 +116,7 @@ func (p *Plant) Image() string {
 }
 
 func (p *Plant) DaysAlive() int {
-	currentTime := time.Now()
+	currentTime := p.LastUpdated
 	elapsed := currentTime.Sub(p.CreationTime)
 
 	// Day 1 is the creation day, no matter what time
@@ -125,7 +125,7 @@ func (p *Plant) DaysAlive() int {
 	}
 
 	// After 24 hours, calculate normally but add 1 to start from day 1
-	days := (elapsed.Hours() / 24) + 1
+	days := elapsed.Hours() / 24
 	return int(days)
 }
 
@@ -152,6 +152,7 @@ func (p *Plant) Validate() error {
 }
 
 // RenderGrowthStage maps a plant growth stage to a UIGrowthStage with UI-specific information
+// TODO: Implement this functionality in the UI
 func (p *Plant) RenderGrowthStage(stage GrowthStage) UIGrowthStage {
 	growthStages := map[GrowthStage]UIGrowthStage{
 		Seeding: {

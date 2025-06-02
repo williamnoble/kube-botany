@@ -109,8 +109,6 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 
 func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	plantName := strings.Split(plant, "-")[3]
-	// remove default images from /images/ so they are in the commit history, but generated
-	// images are excluded from the commit history
 	sourcePlaceholderImg := fmt.Sprintf("%s/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
 	destinationImg := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
 	src, err := os.Open(sourcePlaceholderImg)

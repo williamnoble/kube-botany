@@ -71,6 +71,7 @@ func TestUpdateGrowth(t *testing.T) {
 	assert.Equal(t, int64(15), p.CurrentGrowth())
 	assert.Equal(t, plant.Seeding.String(), p.GrowthStage())
 	assert.Equal(t, p.DaysToMaturity(), 47)
+	assert.Equal(t, 3, p.DaysAlive())
 
 	// bonsai grows 5 units per day and 150 units in 30 days; it's now growing
 	// it fully matures in 20 days
@@ -79,6 +80,7 @@ func TestUpdateGrowth(t *testing.T) {
 	assert.Equal(t, int64(150), p.CurrentGrowth())
 	assert.Equal(t, plant.Growing.String(), p.GrowthStage())
 	assert.Equal(t, p.DaysToMaturity(), 20)
+	assert.Equal(t, 30, p.DaysAlive())
 
 	// bonsai grows 5 units per day and 250 units in 50 days, it's fully matured
 	dayFifty := currentTime.Add(24 * time.Hour * 50)
@@ -86,6 +88,7 @@ func TestUpdateGrowth(t *testing.T) {
 	assert.Equal(t, int64(250), p.CurrentGrowth())
 	assert.Equal(t, plant.Maturing.String(), p.GrowthStage())
 	assert.Equal(t, p.DaysToMaturity(), 0)
+	assert.Equal(t, 50, p.DaysAlive())
 }
 
 func TestUpdate(t *testing.T) {
