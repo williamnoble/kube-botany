@@ -1,4 +1,4 @@
-package store
+package repository
 
 import (
 	"errors"
@@ -34,7 +34,7 @@ type PlantRepository interface {
 	// UpdatePlantById Updates a specific plant's state
 	UpdatePlantById(namespacedName string) error
 
-	// GetVariety Get plant type characteristics
+	// GetVarietyUnsafe Get plant type characteristics. This is not thread-safe.
 	GetVarietyUnsafe(plantType string) (plant.Variety, error)
 
 	// ListSupportedVarieties lists the types of plant variety supported by the backend
@@ -194,6 +194,8 @@ func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
 	return nil
 }
 
+// GetVarietyUnsafe is NOT threadsafe. This function should ONLY be called by another function which has
+// a mutex lock on the underlying data.
 func (s *InMemoryStore) GetVarietyUnsafe(variety string) (plant.Variety, error) {
 	v, ok := s.Varieties[variety]
 	if !ok {
