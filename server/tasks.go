@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// BackgroundTasks sets up background tasks:
+// - task: runs the image generation task every 24 hours.
 func (s *Server) BackgroundTasks() {
 	s.Logger.With("component", "tasks").Info("starting background tasks")
 

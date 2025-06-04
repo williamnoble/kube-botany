@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/williamnoble/kube-botany/render"
-	"github.com/williamnoble/kube-botany/repository/store"
+	"github.com/williamnoble/kube-botany/repository"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -20,8 +20,8 @@ type Server struct {
 	Logger    *slog.Logger // Logger for httpServer logs
 	startTime time.Time    // Time when the httpServer started
 
-	store    store.PlantRepository // Repository for plants
-	renderer *render.ASCIIRenderer // Renderer for ASCII art
+	store    repository.PlantRepository // Repository for plants
+	renderer *render.ASCIIRenderer      // Renderer for ASCII art
 
 	httpServer *http.Server
 }
@@ -33,7 +33,7 @@ func NewServer(populateStore bool) (*Server, error) {
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
-	inMemoryStore, err := store.NewInMemoryStore(populateStore)
+	inMemoryStore, err := repository.NewInMemoryStore(populateStore)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
 	}

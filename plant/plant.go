@@ -52,6 +52,7 @@ func (p *Plant) updateWaterConsumption(currentTime time.Time) {
 	}
 }
 
+// elapsedDays calculates the elapsed time in days since the last update.
 func elapsedDays(currentTime time.Time, lastUpdatedTime time.Time) float64 {
 	elapsed := currentTime.Sub(lastUpdatedTime)
 	days := elapsed.Hours() / 24
@@ -60,11 +61,7 @@ func elapsedDays(currentTime time.Time, lastUpdatedTime time.Time) float64 {
 
 // updateGrowth calculates and applies growth progress since the last update.
 func (p *Plant) updateGrowth(currentTime time.Time) {
-	// calculate elapsed time (days), since the last update
-	//elapsed := currentTime.Sub(p.LastUpdated)
-	//days := elapsed.Hours() / 24
 	elapsedDays := elapsedDays(currentTime, p.LastUpdated)
-
 	// growth is determined solely by the elapsed time and the plant's growth rate.
 	// the growth accumulates in CurrentGrowth, which is used to determine the
 	// plant's growth stage.

@@ -35,6 +35,8 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HandleGetPlantAscii returns a single plant by ID as ASCII text including an ASCII image
+// which varies depending on the plant's growth stage
 func (s *Server) HandleGetPlantAscii(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	p, err := s.store.GetPlant(id)
@@ -61,8 +63,7 @@ func (s *Server) HandlePlantDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// HandleWaterPlant adds water to a plant
-// It accepts a JSON request with a plant ID, adds water to the plant, and returns a response with a message and the updated plant
+// HandleWaterPlant adds water; a single request waters a plant to 100%
 func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	p, err := s.store.GetPlant(id)
@@ -155,5 +156,4 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 
 	//s.plants = append(s.plants, p)
 	w.WriteHeader(http.StatusCreated)
-
 }

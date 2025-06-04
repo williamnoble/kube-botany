@@ -4,7 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/williamnoble/kube-botany/plant"
-	"github.com/williamnoble/kube-botany/repository/store"
+	"github.com/williamnoble/kube-botany/repository"
 	"os"
 	"path"
 	"runtime"
@@ -13,13 +13,13 @@ import (
 )
 
 // the newInMemoryStore fn returns a new in-memory store for testing, filepath is incorrect if we use the std func.
-func newInMemoryStore(t *testing.T) store.PlantRepository {
+func newInMemoryStore(t *testing.T) repository.PlantRepository {
 	t.Helper()
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..")
 	err := os.Chdir(dir)
 	require.NoError(t, err)
-	s, err := store.NewInMemoryStore(false)
+	s, err := repository.NewInMemoryStore(false)
 	require.NoError(t, err)
 	return s
 }

@@ -22,6 +22,7 @@ type ImageGenerationService struct {
 	generator ImageGeneratorFunction
 }
 
+// NewImageGenerationService creates a new ImageGenerationService instance with the given staticDir and logger.
 func NewImageGenerationService(staticDir string, logger *slog.Logger) *ImageGenerationService {
 	s := ImageGenerationService{
 		staticDir: staticDir,
@@ -31,6 +32,7 @@ func NewImageGenerationService(staticDir string, logger *slog.Logger) *ImageGene
 	return &s
 }
 
+// NewMockImageGenerationService creates a new ImageGenerationService instance with the given staticDir and logger.
 func NewMockImageGenerationService(
 	staticDir string,
 	logger *slog.Logger) *ImageGenerationService {
@@ -74,6 +76,7 @@ func (s *ImageGenerationService) ImageTask(plants map[string]*plant.Plant) error
 	return nil
 }
 
+// GenerateImageOpenAI generates an image using OpenAI's ImageModelGPTImage1 model'.
 func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 
 	client := openai.NewClient(
@@ -107,6 +110,7 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 	return nil
 }
 
+// GenerateMockImage uses a placeholder image to generate a mock image for a given plant.
 func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	plantName := strings.Split(plant, "-")[3]
 	sourcePlaceholderImg := fmt.Sprintf("%s/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))

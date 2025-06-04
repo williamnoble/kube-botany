@@ -18,6 +18,8 @@ type Variety struct {
 
 type Varieties = map[string]Variety
 
+// VarietiesFromJson reads a JSON file containing plant varieties and characteristics like water requirements
+// and returns a map of Variety objects.
 func VarietiesFromJson(filePath string) (Varieties, error) {
 	var varieties Varieties
 

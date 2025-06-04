@@ -34,6 +34,7 @@ func (s *Server) decodeJsonResponse(r *http.Request, v interface{}) error {
 	return nil
 }
 
+// InternalServerErrorResponse is a convenience function for returning an error response with status code 500
 func (s *Server) InternalServerErrorResponse(w http.ResponseWriter, err error) {
 	s.Logger.Error("internal server error", "error", err)
 

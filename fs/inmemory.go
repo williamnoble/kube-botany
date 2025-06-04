@@ -31,12 +31,14 @@ type InMemoryImageStore struct {
 	mu     sync.RWMutex
 }
 
+// NewInMemoryImageStore returns a new in-memory image store
 func NewInMemoryImageStore() ImageStore {
 	return &InMemoryImageStore{
 		images: make(map[string][]ImageMetadata),
 	}
 }
 
+// GetImage returns the image data for the given key and file name.
 func (s *InMemoryImageStore) GetImage(key, fileName string) (*ImageMetadata, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -52,6 +54,7 @@ func (s *InMemoryImageStore) GetImage(key, fileName string) (*ImageMetadata, err
 	return nil, ErrImageNotFound
 }
 
+// SaveImage saves the image data for the given key and file name.
 func (s *InMemoryImageStore) SaveImage(key string, fileName string, imageData []byte) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -62,6 +65,7 @@ func (s *InMemoryImageStore) SaveImage(key string, fileName string, imageData []
 	s.images[key] = append(s.images[key], image)
 }
 
+// DeleteImage deletes the image data for the given key and file name.
 func (s *InMemoryImageStore) DeleteImage(key, fileName string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -82,6 +86,8 @@ func (s *InMemoryImageStore) DeleteImage(key, fileName string) error {
 	return ErrImageNotFound
 }
 
+// DeleteKey deletes the image data for the given key. The key will be the ID of the plant, if we delete a plant
+// we delete all images associated with that plant.
 func (s *InMemoryImageStore) DeleteKey(key string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -93,6 +99,7 @@ func (s *InMemoryImageStore) DeleteKey(key string) bool {
 	return false
 }
 
+// GetImagesForKey returns all images for the given key.
 func (s *InMemoryImageStore) GetImagesForKey(key string) ([]ImageMetadata, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -101,6 +108,7 @@ func (s *InMemoryImageStore) GetImagesForKey(key string) ([]ImageMetadata, bool)
 	return images, exists
 }
 
+// List returns all keys in the image store.
 func (s *InMemoryImageStore) List() []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -112,6 +120,7 @@ func (s *InMemoryImageStore) List() []string {
 	return keys
 }
 
+// CountByKey returns the number of images for the given key.
 func (s *InMemoryImageStore) CountByKey(key string) int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -122,6 +131,7 @@ func (s *InMemoryImageStore) CountByKey(key string) int {
 	return 0
 }
 
+// Clear clears all images from the image store.
 func (s *InMemoryImageStore) Clear() {
 	s.mu.Lock()
 	defer s.mu.Unlock()

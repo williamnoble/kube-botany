@@ -8,10 +8,12 @@ import (
 // ASCIIRenderer renders the plant as ASCII art
 type ASCIIRenderer struct{}
 
+// NewASCIIRenderer creates a new ASCIIRenderer
 func NewASCIIRenderer() *ASCIIRenderer {
 	return &ASCIIRenderer{}
 }
 
+// RenderText renders the plant as ASCII art depending on its growth stage
 func (r *ASCIIRenderer) RenderText(p *plant.Plant) string {
 	asciiArt := map[string]string{
 		"seeding":   seeding,
