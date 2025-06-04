@@ -18,8 +18,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 	go func() {
 		if err := svr.Start(8090); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			svr.Logger.With("component", "server").Error("server error", "error", err)
@@ -27,14 +27,14 @@ func main() {
 		}
 	}()
 
-	<-quit
+	<-ctx.Done()
 	shutdownTimeout := 10 * time.Second
 	svr.Logger.With("component", "server").Info("starting graceful shutdown...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
-	if err := svr.Shutdown(ctx); err != nil {
+	if err := svr.Shutdown(shutdownCtx); err != nil {
 		svr.Logger.With("component", "server").Error("graceful shutdown failed", "error", err)
 		panic(err)
 	}
