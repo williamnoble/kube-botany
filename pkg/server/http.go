@@ -53,7 +53,7 @@ func (s *Server) InternalServerErrorResponse(w http.ResponseWriter, err error) {
 // WaterResponse is the response returned by the water endpoint
 type WaterResponse struct {
 	Message string         `json:"message"` // Message about the watering result
-	Plant   types.PlantDTO // Updated plant information
+	Plant   types.PlantDTO `json:"plant"`   // Updated plant information
 }
 
 // WaterRequest contains the Id identifier of the plant being watered

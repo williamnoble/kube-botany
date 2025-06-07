@@ -27,6 +27,7 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 	p, err := s.store.GetPlant(id)
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
+		return
 	}
 	plantDTO := types.IntoPlantDTO(p)
 	err = s.encodeJsonResponse(w, r, http.StatusOK, plantDTO)
@@ -135,6 +136,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HandleCreatePlant creates a new plant from the request body
 func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	var dto types.PlantDTO
 	err := s.decodeJsonRequest(r, &dto)

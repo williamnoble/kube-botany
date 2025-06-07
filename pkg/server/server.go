@@ -13,13 +13,13 @@ import (
 	"time"
 )
 
-// Server represents the HTTP httpServer for the plant application
+// Server represents the HTTP server for the plant application
 type Server struct {
 	staticDir string                        // Directory for static assets
 	templates map[string]*template.Template // Parsed HTML templates
 
-	Logger    *slog.Logger // Logger for httpServer logs
-	startTime time.Time    // Time when the httpServer started
+	Logger    *slog.Logger // Logger for server logs
+	startTime time.Time    // Time when the server started
 
 	store    repository.PlantRepository // Repository for plants
 	renderer *render.ASCIIRenderer      // Renderer for ASCII art
@@ -27,8 +27,8 @@ type Server struct {
 	httpServer *http.Server
 }
 
-// NewServer creates a new httpServer instance with the given plants
-// It initialises the logger, renderer, templates, and other httpServer components
+// NewServer creates a new Server instance with the given plants
+// It initialises the logger, renderer, templates, and other server components
 func NewServer(inMemoryStore repository.PlantRepository) (*Server, error) {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
@@ -48,7 +48,7 @@ func NewServer(inMemoryStore repository.PlantRepository) (*Server, error) {
 	return s, nil
 }
 
-// Start starts the HTTP httpServer on the specified port
+// Start starts the HTTP server on the specified port
 // It sets up the routes, adds the request logger middleware, and starts listening for requests
 func (s *Server) Start(portStr string) error {
 	port, err := strconv.Atoi(portStr)

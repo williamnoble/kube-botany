@@ -11,7 +11,7 @@ func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()
 
 	// handle static assets
-	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("pkg/static"))))
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir(s.staticDir))))
 
 	// handle API Endpoints
 	r.Route("/api/plants", func(r chi.Router) {
