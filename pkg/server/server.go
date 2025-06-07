@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -35,8 +34,7 @@ func NewServer(populateStore bool) (*Server, error) {
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
-	filePath := filepath.Join("pkg/plant/", "varieties.json")
-	inMemoryStore, err := repository.NewInMemoryStore(populateStore, filePath)
+	inMemoryStore, err := repository.NewInMemoryStore(populateStore)
 	if err != nil {
 		return nil, fmt.Errorf("server: failed to create in-memory store: %w", err)
 	}
