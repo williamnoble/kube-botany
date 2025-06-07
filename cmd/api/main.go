@@ -27,6 +27,8 @@ func main() {
 		}
 	}()
 
+	go svr.BackgroundTasks(ctx)
+
 	<-ctx.Done()
 	shutdownTimeout := 10 * time.Second
 	svr.Logger.With("component", "server").Info("starting graceful shutdown...")

@@ -69,8 +69,6 @@ func (s *Server) Start(port int) error {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	go s.BackgroundTasks()
-
 	return s.httpServer.ListenAndServe()
 }
 

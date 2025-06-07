@@ -1,30 +1,39 @@
 package server
 
 import (
+	"context"
 	"github.com/williamnoble/kube-botany/pkg/gen"
 	"time"
 )
 
 // BackgroundTasks sets up background tasks:
 // - task: runs the image generation task every 24 hours.
-func (s *Server) BackgroundTasks() {
+func (s *Server) BackgroundTasks(ctx context.Context) {
 	s.Logger.With("component", "tasks").Info("starting background tasks")
-
 	imgSvc := gen.NewMockImageGenerationService(s.staticDir, s.Logger)
-
-	// run the task once on startup
-	plants := s.store.ListAllPlants()
-	err := imgSvc.ImageTask(plants)
-	if err != nil {
-		s.Logger.With("component", "tasks").Error("error processing task", "error", err)
+	// Run the task once on startup
+	if err := runImageTask(s, imgSvc); err != nil {
+		s.Logger.With("component", "tasks").Error("error processing initial task", "error", err)
 	}
 
-	ticker := time.NewTimer(24 * time.Hour)
+	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
-	for range ticker.C {
-		err = imgSvc.ImageTask(plants)
-		if err != nil {
-			s.Logger.With("component", "tasks").Error("error processing task", "error", err)
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := runImageTask(s, imgSvc); err != nil {
+				s.Logger.With("component", "tasks").Error("error processing scheduled task", "error", err)
+			}
+		case <-ctx.Done():
+			s.Logger.With("component", "tasks").Info("stopping background tasks")
+			return
 		}
 	}
+}
+
+// runImageTask runs the image generation task with the current list of plants
+func runImageTask(s *Server, imgSvc *gen.ImageGenerationService) error {
+	plants := s.store.ListAllPlants()
+	return imgSvc.ImageTask(plants)
 }
