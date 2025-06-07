@@ -3,7 +3,6 @@ package plant
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -31,7 +30,7 @@ func VarietiesFromJson(filePath string) (Varieties, error) {
 
 	err = json.Unmarshal(fileData, &varieties)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to unmarshal varieties JSON: %w", err)
 	}
 
 	// we store a pointer to Variety in the Plant type, for ease

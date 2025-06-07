@@ -39,8 +39,6 @@ func (p *Plant) Update(currentTime time.Time) {
 func (p *Plant) updateWaterConsumption(currentTime time.Time) {
 	// calculate elapsed time (days), since the last update
 	elapsedDays := elapsedDays(currentTime, p.LastUpdated)
-	//elapsed := currentTime.Sub(p.LastUpdated)
-	//days := elapsed.Hours() / 24
 
 	//  determining water consumed based on the consumption rate of a particular variety of plant.
 	waterConsumed := int(float64(p.Variety.WaterConsumptionUnitsPerDay) * elapsedDays)
@@ -107,6 +105,7 @@ func (p *Plant) DaysToMaturity() int {
 	return int(math.Ceil(daysRemaining))
 }
 
+// Image returns the filename for the plant's image
 func (p *Plant) Image() string {
 	formattedDate := time.Now().Format("2006-01-02")
 	return fmt.Sprintf("%s-%s.png", formattedDate, p.Id)
@@ -143,8 +142,24 @@ func (p *Plant) Healthy() bool {
 	return p.CurrentWaterLevel() >= p.Variety.MinimumWaterLevel
 }
 
+// Validate checks if the plant has valid data
 func (p *Plant) Validate() error {
-	// TODO, implement Zod or Zog? I forgot
+	if p.Id == "" {
+		return fmt.Errorf("plant ID cannot be empty")
+	}
+
+	if p.Variety == nil {
+		return fmt.Errorf("plant variety cannot be nil")
+	}
+
+	if p.CreationTime.IsZero() {
+		return fmt.Errorf("plant creation time cannot be zero")
+	}
+
+	if p.LastUpdated.IsZero() {
+		return fmt.Errorf("plant last updated time cannot be zero")
+	}
+
 	return nil
 }
 

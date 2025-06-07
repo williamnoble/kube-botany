@@ -13,7 +13,7 @@ import (
 
 type PlantRepository interface {
 	// NewPlant Create a new plant
-	NewPlant(Id, friendlyName, plantType string, creationTime time.Time) (*plant.Plant, error)
+	NewPlant(id, friendlyName, plantType string, creationTime time.Time) (*plant.Plant, error)
 
 	// GetPlant Retrieve a plant by ID
 	GetPlant(id string) (*plant.Plant, error)
@@ -28,10 +28,10 @@ type PlantRepository interface {
 	ListAllPlants() map[string]*plant.Plant
 
 	// UpdatePlants Update all plants' state
-	UpdatePlants(namespacedNames []string) error
+	UpdatePlants(ids []string) error
 
 	// UpdatePlantById Updates a specific plant's state
-	UpdatePlantById(Id string) error
+	UpdatePlantById(id string) error
 
 	// GetVarietyUnsafe Get plant type characteristics. This is not thread-safe.
 	GetVarietyUnsafe(plantType string) (plant.Variety, error)
@@ -39,7 +39,7 @@ type PlantRepository interface {
 	// ListSupportedVarieties lists the types of plant variety supported by the backend
 	ListSupportedVarieties() []string
 
-	// Variety returns the characterists of a particular variety of plant
+	// Variety returns the characteristics of a particular variety of plant
 	Variety(variety string) (plant.Variety, error)
 }
 
@@ -72,7 +72,7 @@ func NewInMemoryStore(populateStore bool, varietiesFilePath string) (PlantReposi
 }
 
 func (s *InMemoryStore) NewPlant(
-	Id string,
+	id string,
 	friendlyName string,
 	varietyType string,
 	creationTime time.Time) (*plant.Plant, error) {
@@ -90,7 +90,7 @@ func (s *InMemoryStore) NewPlant(
 	}
 
 	p := &plant.Plant{
-		Id:           Id,
+		Id:           id,
 		FriendlyName: friendlyName,
 		Variety:      &variety,
 		CreationTime: creationTime,
@@ -102,8 +102,8 @@ func (s *InMemoryStore) NewPlant(
 		return nil, err
 	}
 
-	s.Plants[Id] = p
-	s.PlantsByVariety[varietyType] = append(s.PlantsByVariety[varietyType], Id)
+	s.Plants[id] = p
+	s.PlantsByVariety[varietyType] = append(s.PlantsByVariety[varietyType], id)
 
 	return p, nil
 }
@@ -117,29 +117,28 @@ func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
 		return nil, errors.New("plant not found")
 	}
 	return p, nil
-
 }
 
-func (s *InMemoryStore) UpdatePlantById(Id string) error {
+func (s *InMemoryStore) UpdatePlantById(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	for id, p := range s.Plants {
-		if id == Id {
-			p.Update(time.Now())
-			return nil
-		}
+	p, ok := s.Plants[id]
+	if !ok {
+		return errors.New("plant not found")
 	}
-	return errors.New("plant not found")
+
+	p.Update(time.Now())
+	return nil
 }
 
 func (s *InMemoryStore) DeletePlant(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	p, err := s.GetPlant(id)
-	if err != nil {
-		return fmt.Errorf("failed to delete plant: %w", err)
+	p, ok := s.Plants[id]
+	if !ok {
+		return errors.New("plant not found")
 	}
 
 	delete(s.Plants, id)
@@ -151,18 +150,20 @@ func (s *InMemoryStore) DeletePlant(id string) error {
 	}
 
 	return nil
-
 }
 
 func (s *InMemoryStore) ListPlantsByType(plantType string) (map[string][]string, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	_, ok := s.PlantsByVariety[plantType]
+	plantIDs, ok := s.PlantsByVariety[plantType]
 	if !ok {
 		return make(map[string][]string), errors.New("plant type not found")
 	}
-	return s.PlantsByVariety, nil
+
+	result := make(map[string][]string)
+	result[plantType] = plantIDs
+	return result, nil
 }
 
 func (s *InMemoryStore) ListAllPlants() map[string]*plant.Plant {
@@ -172,21 +173,23 @@ func (s *InMemoryStore) ListAllPlants() map[string]*plant.Plant {
 	return s.Plants
 }
 
-func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
+func (s *InMemoryStore) UpdatePlants(ids []string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	var failedErrs []error
 
-	for _, Id := range namespacedNames {
-		err := s.UpdatePlantById(Id)
-		if err != nil {
-			failedErrs = append(failedErrs, err)
+	for _, id := range ids {
+		p, ok := s.Plants[id]
+		if !ok {
+			failedErrs = append(failedErrs, fmt.Errorf("plant not found: %s", id))
+			continue
 		}
+		p.Update(time.Now())
 	}
 
 	if len(failedErrs) > 0 {
-		return fmt.Errorf("failedErrs to update plants: %v", errors.Join(failedErrs...))
+		return fmt.Errorf("failed to update plants: %v", errors.Join(failedErrs...))
 	}
 
 	return nil

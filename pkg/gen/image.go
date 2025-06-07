@@ -76,9 +76,8 @@ func (s *ImageGenerationService) ImageTask(plants map[string]*plant.Plant) error
 	return nil
 }
 
-// GenerateImageOpenAI generates an image using OpenAI's ImageModelGPTImage1 model'.
+// GenerateImageOpenAI generates an image using OpenAI's ImageModelGPTImage1 model.
 func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
-
 	client := openai.NewClient(
 		option.WithBaseURL("https://openrouter.ai/api/v1"))
 
@@ -92,19 +91,25 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 		N:              openai.Int(1),
 	})
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to generate image: %w", err)
 	}
 
 	imageBytes, err := base64.StdEncoding.DecodeString(image.Data[0].B64JSON)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to decode base64 image: %w", err)
 	}
 
-	dest := "./image.png"
-	println("Writing image to " + dest)
-	err = os.WriteFile(dest, imageBytes, 0755)
+	dest := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
+	s.logger.With("component", "generator").Info("writing image", "path", dest)
+
+	dir := fmt.Sprintf("%s/images", s.staticDir)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	err = os.WriteFile(dest, imageBytes, 0644)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to write image file: %w", err)
 	}
 
 	return nil
@@ -134,17 +139,20 @@ func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	return nil
 }
 
-func GenerateText() {
+// GenerateText generates text using OpenAI's GPT-4o model.
+func GenerateText(prompt string) (string, error) {
 	client := openai.NewClient(
 		option.WithBaseURL("https://openrouter.ai/api/v1"))
+
 	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage("Say this is a test"),
+			openai.UserMessage(prompt),
 		},
 		Model: openai.ChatModelGPT4o,
 	})
 	if err != nil {
-		panic(err.Error())
+		return "", fmt.Errorf("failed to generate text: %w", err)
 	}
-	println(chatCompletion.Choices[0].Message.Content)
+
+	return chatCompletion.Choices[0].Message.Content, nil
 }

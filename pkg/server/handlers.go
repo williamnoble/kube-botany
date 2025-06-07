@@ -40,12 +40,13 @@ func (s *Server) HandleGetPlant(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandleGetPlantAscii(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	p, err := s.store.GetPlant(id)
-	var text string
-	text += s.renderer.RenderText(p)
 	if err != nil {
 		http.Error(w, "Plant not found", http.StatusNotFound)
+		return
 	}
-	w.Header().Set("Content-Variety", "text/plain; charset=utf-8")
+
+	text := s.renderer.RenderText(p)
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	_, err = w.Write([]byte(text))
 	if err != nil {
 		s.InternalServerErrorResponse(w, err)
@@ -136,7 +137,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	var dto types.PlantDTO
-	err := s.decodeJsonResponse(r, &dto)
+	err := s.decodeJsonRequest(r, &dto)
 	if err != nil {
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
@@ -154,6 +155,5 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//s.plants = append(s.plants, p)
 	w.WriteHeader(http.StatusCreated)
 }
