@@ -7,18 +7,17 @@ import (
 )
 
 // BackgroundTasks sets up background tasks:
-// - task: runs the image generation task every 24 hours.
 func (s *Server) BackgroundTasks(ctx context.Context) {
 	s.Logger.With("component", "tasks").Info("starting background tasks")
 	imgSvc := gen.NewMockImageGenerationService(s.staticDir, s.Logger)
+
 	// Run the task once on startup
 	if err := runImageTask(s, imgSvc); err != nil {
 		s.Logger.With("component", "tasks").Error("error processing initial task", "error", err)
 	}
 
-	ticker := time.NewTicker(24 * time.Hour)
+	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
-
 	for {
 		select {
 		case <-ticker.C:

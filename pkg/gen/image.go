@@ -58,13 +58,11 @@ func (s *ImageGenerationService) ImageTask(plants map[string]*plant.Plant) error
 			s.logger.With("component", "generator").Info("generating missing image", "image", plantImageName)
 			err := s.generator(plantImageName)
 			if err != nil {
-				s.logger.With("component", "generator").Error("image generation failed", "image", plantImageName, "error", err.Error())
 				errs = append(errs, fmt.Errorf("failed to generate image %s: %w", plantImageName, err))
 				continue
 			}
 			s.logger.With("component", "generator").Info("image generated successfully", "image", plantImageName)
 		} else if err != nil {
-			s.logger.Error("failed to check if image exists", "image", plantImageName, "error", err.Error())
 			errs = append(errs, fmt.Errorf("failed to check image %s: %w", plantImageName, err))
 		}
 	}

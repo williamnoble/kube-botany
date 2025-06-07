@@ -11,14 +11,14 @@ image generation at the moment. Most other functions are complete, with tests.
 ![kube-botany overview](assets/kube-botany.png)
 
 ## TODO (missing features)
-- Implement Operator (currently in-progress, I'm writing with kube-builder and experimenting with controller-runtime
+- [ ] Implement Operator (currently in-progress, I'm writing with kube-builder and experimenting with controller-runtime
   directly).
-- Implement Image Generation via OpenRouter, currently OpenRouter doesn't support Image Generation hence, I stopped
+- [ ] Implement Image Generation via OpenRouter, currently OpenRouter doesn't support Image Generation hence, I stopped
   developing for the time being. Because I can't experiment within the backend I haven't worked properly on the correct
   prompts, I do however, have the prompts I used in the web ui, and they seem to produce fairly consistent results.
-- Improve image caching, add s3/minio fs. Also, ensure the store uses a new in-memory cache for image storing.
-- DTO for communication between Operator/Backend needs work.
-- Consider changing `NamedspacedName` to `ID` it's clearer this works without an Operator component.
+- [ ] Improve image caching, add s3/minio fs. Also, ensure the store uses a new in-memory cache for image storing.
+- [X] ~~DTO for communication between Operator/Backend needs work.~~
+- [X] Consider changing `NamedspacedName` to `ID` it's clearer this works without an Operator component.
 
 
 ### Motivation
