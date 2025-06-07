@@ -238,3 +238,19 @@ func (s *InMemoryStore) Variety(variety string) (plant.Variety, error) {
 	}
 	return s.Varieties[variety], nil
 }
+
+func (s *InMemoryStore) ImageExists(key string, fileName string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	_, err := s.ImageStore.GetImage(key, fileName)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (s *InMemoryStore) SetImage(id string, fileName string, image []byte) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.ImageStore.SaveImage(id, fileName, image)
+}
