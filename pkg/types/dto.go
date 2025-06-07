@@ -7,7 +7,7 @@ import (
 
 // PlantDTO represents a plant in API responses and UI rendering
 type PlantDTO struct {
-	NamespacedName    string `json:"namespaced_name"`      // Unique identifier for the plant
+	Id                string `json:"id"`                   // Unique identifier for the plant
 	FriendlyName      string `json:"friendly_name"`        // Display name for the plant
 	Variety           string `json:"variety"`              // Variety of plant (e.g., bonsai, sunflower)
 	DaysAlive         int    `json:"days_alive,omitempty"` // Number of days the plant has been alive
@@ -22,7 +22,7 @@ type PlantDTO struct {
 func IntoPlantDTO(p *plant.Plant) PlantDTO {
 
 	r := PlantDTO{
-		NamespacedName:    p.NamespacedName, // Unique ID
+		Id:                p.Id, // Unique ID
 		FriendlyName:      p.FriendlyName,
 		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),
@@ -39,7 +39,7 @@ func IntoPlantDTO(p *plant.Plant) PlantDTO {
 // TODO: This uses the wrong types, fix when writing Operator
 func FromPlantDTO(p *plant.Plant) PlantDTO {
 	r := PlantDTO{
-		NamespacedName:    p.NamespacedName,
+		Id:                p.Id,
 		FriendlyName:      p.FriendlyName,
 		Variety:           p.Variety.Type,
 		DaysAlive:         p.DaysAlive(),

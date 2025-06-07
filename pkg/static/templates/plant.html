@@ -16,7 +16,7 @@
             <!-- Water drop button with tooltip -->
             {{if lt .CurrentWaterLevel 100}}
             <div class="relative group">
-                <button onclick="waterPlant('{{.NamespacedName}}')"
+                <button onclick="waterPlant('{{.Id}}')"
                         class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 flex items-center justify-center mr-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512.053 512.053" fill="none" stroke="currentColor" stroke-width="24">
                         <path d="M261.36,437.387C202.48,437.28,154.8,389.6,154.693,330.72c0-5.867-4.8-10.667-10.667-10.667 c-5.867,0-10.667,4.8-10.667,10.667c0.107,70.613,57.387,127.893,128,128c5.867,0,10.667-4.8,10.667-10.667 C272.027,442.187,267.227,437.387,261.36,437.387z"></path>

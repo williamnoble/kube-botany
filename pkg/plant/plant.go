@@ -18,11 +18,11 @@ type Health struct {
 }
 
 type Plant struct {
-	NamespacedName string
-	FriendlyName   string
-	Variety        *Variety
-	CreationTime   time.Time
-	LastUpdated    time.Time
+	Id           string
+	FriendlyName string
+	Variety      *Variety
+	CreationTime time.Time
+	LastUpdated  time.Time
 
 	Health Health
 }
@@ -109,7 +109,7 @@ func (p *Plant) DaysToMaturity() int {
 
 func (p *Plant) Image() string {
 	formattedDate := time.Now().Format("2006-01-02")
-	return fmt.Sprintf("%s-%s.png", formattedDate, p.NamespacedName)
+	return fmt.Sprintf("%s-%s.png", formattedDate, p.Id)
 }
 
 func (p *Plant) DaysAlive() int {

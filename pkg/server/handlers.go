@@ -75,7 +75,7 @@ func (s *Server) HandleWaterPlant(w http.ResponseWriter, r *http.Request) {
 	message := "plant is fully watered and cannot be watered anymore."
 	unitsAdded := p.AddWater()
 	if unitsAdded > 0 {
-		message = fmt.Sprintf("added %d units of water to %s (%d%% watered).", unitsAdded, p.NamespacedName, p.CurrentWaterLevel())
+		message = fmt.Sprintf("added %d units of water to %s (%d%% watered).", unitsAdded, p.Id, p.CurrentWaterLevel())
 	}
 
 	response := WaterResponse{
@@ -97,7 +97,7 @@ func (s *Server) HandleRenderHomePage(w http.ResponseWriter, r *http.Request) {
 	for _, plant := range plants {
 		dto := types.IntoPlantDTO(plant)
 		if dto.FriendlyName == "" {
-			dto.FriendlyName = dto.NamespacedName
+			dto.FriendlyName = dto.Id
 		}
 		data = append(data, dto)
 	}
@@ -124,7 +124,7 @@ func (s *Server) HandlePlantDetail(w http.ResponseWriter, r *http.Request) {
 
 	plantDTO := types.IntoPlantDTO(p)
 	if plantDTO.FriendlyName == "" {
-		plantDTO.FriendlyName = plantDTO.NamespacedName
+		plantDTO.FriendlyName = plantDTO.Id
 	}
 
 	err = s.templates["plant"].ExecuteTemplate(w, "layout.html", plantDTO)
@@ -143,7 +143,7 @@ func (s *Server) HandleCreatePlant(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = s.store.NewPlant(
-		dto.NamespacedName,
+		dto.Id,
 		dto.FriendlyName,
 		dto.Variety,
 		time.Now(),

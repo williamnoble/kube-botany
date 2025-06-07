@@ -18,7 +18,7 @@ POST {{localhost}}/{{api}}
 Content-Type: application/json
 
 {
-  "namespaced_name": "defaultCactus246",
+  "id": "defaultCactus246",
   "friendly_name": "my-cactus",
   "variety": "cactus"
 }

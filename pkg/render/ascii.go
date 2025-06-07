@@ -24,7 +24,7 @@ func (r *ASCIIRenderer) RenderText(p *plant.Plant) string {
 	}
 
 	var text string
-	text += fmt.Sprintf("\nName: %s\n", p.NamespacedName)
+	text += fmt.Sprintf("\nName: %s\n", p.Id)
 	text += fmt.Sprintf("FriendlyName: %s\n", p.FriendlyName)
 	waterBar := renderBar("Water Level:", p.CurrentWaterLevel(), 100)
 	text += waterBar + "\n"

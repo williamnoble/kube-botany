@@ -56,7 +56,7 @@ type WaterResponse struct {
 	Plant   types.PlantDTO // Updated plant information
 }
 
-// WaterRequest contains the NamespacedName identifier of the plant being watered
+// WaterRequest contains the Id identifier of the plant being watered
 type WaterRequest struct {
-	NamespacedName string `json:"namespaced_name"` // ID of the plant to water
+	Id string `json:"id"` // ID of the plant to water
 }

@@ -13,7 +13,7 @@ import (
 
 type PlantRepository interface {
 	// NewPlant Create a new plant
-	NewPlant(namespacedName, friendlyName, plantType string, creationTime time.Time) (*plant.Plant, error)
+	NewPlant(Id, friendlyName, plantType string, creationTime time.Time) (*plant.Plant, error)
 
 	// GetPlant Retrieve a plant by ID
 	GetPlant(id string) (*plant.Plant, error)
@@ -31,7 +31,7 @@ type PlantRepository interface {
 	UpdatePlants(namespacedNames []string) error
 
 	// UpdatePlantById Updates a specific plant's state
-	UpdatePlantById(namespacedName string) error
+	UpdatePlantById(Id string) error
 
 	// GetVarietyUnsafe Get plant type characteristics. This is not thread-safe.
 	GetVarietyUnsafe(plantType string) (plant.Variety, error)
@@ -72,7 +72,7 @@ func NewInMemoryStore(populateStore bool, varietiesFilePath string) (PlantReposi
 }
 
 func (s *InMemoryStore) NewPlant(
-	namespacedName string,
+	Id string,
 	friendlyName string,
 	varietyType string,
 	creationTime time.Time) (*plant.Plant, error) {
@@ -90,20 +90,20 @@ func (s *InMemoryStore) NewPlant(
 	}
 
 	p := &plant.Plant{
-		NamespacedName: namespacedName,
-		FriendlyName:   friendlyName,
-		Variety:        &variety,
-		CreationTime:   creationTime,
-		LastUpdated:    creationTime,
-		Health:         health,
+		Id:           Id,
+		FriendlyName: friendlyName,
+		Variety:      &variety,
+		CreationTime: creationTime,
+		LastUpdated:  creationTime,
+		Health:       health,
 	}
 
 	if err := p.Validate(); err != nil {
 		return nil, err
 	}
 
-	s.Plants[namespacedName] = p
-	s.PlantsByVariety[varietyType] = append(s.PlantsByVariety[varietyType], namespacedName)
+	s.Plants[Id] = p
+	s.PlantsByVariety[varietyType] = append(s.PlantsByVariety[varietyType], Id)
 
 	return p, nil
 }
@@ -120,12 +120,12 @@ func (s *InMemoryStore) GetPlant(id string) (*plant.Plant, error) {
 
 }
 
-func (s *InMemoryStore) UpdatePlantById(namespacedName string) error {
+func (s *InMemoryStore) UpdatePlantById(Id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	for id, p := range s.Plants {
-		if id == namespacedName {
+		if id == Id {
 			p.Update(time.Now())
 			return nil
 		}
@@ -178,8 +178,8 @@ func (s *InMemoryStore) UpdatePlants(namespacedNames []string) error {
 
 	var failedErrs []error
 
-	for _, namespacedName := range namespacedNames {
-		err := s.UpdatePlantById(namespacedName)
+	for _, Id := range namespacedNames {
+		err := s.UpdatePlantById(Id)
 		if err != nil {
 			failedErrs = append(failedErrs, err)
 		}
