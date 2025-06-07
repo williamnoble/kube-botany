@@ -12,7 +12,7 @@ func (s *Server) BackgroundTasks(ctx context.Context) {
 	imgSvc := gen.NewMockImageGenerationService(s.staticDir, s.Logger)
 
 	// Run the task once on startup
-	if err := runImageTask(s, imgSvc); err != nil {
+	if err := s.runImageTask(imgSvc); err != nil {
 		s.Logger.With("component", "tasks").Error("error processing initial task", "error", err)
 	}
 
@@ -21,7 +21,7 @@ func (s *Server) BackgroundTasks(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			if err := runImageTask(s, imgSvc); err != nil {
+			if err := s.runImageTask(imgSvc); err != nil {
 				s.Logger.With("component", "tasks").Error("error processing scheduled task", "error", err)
 			}
 		case <-ctx.Done():
@@ -32,7 +32,7 @@ func (s *Server) BackgroundTasks(ctx context.Context) {
 }
 
 // runImageTask runs the image generation task with the current list of plants
-func runImageTask(s *Server, imgSvc *gen.ImageGenerationService) error {
+func (s *Server) runImageTask(imgSvc *gen.ImageGenerationService) error {
 	plants := s.store.ListAllPlants()
 	return imgSvc.ImageTask(plants)
 }

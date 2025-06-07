@@ -7,8 +7,8 @@ import (
 	"fmt"
 	openai "github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
+	"github.com/williamnoble/kube-botany/pkg/fs"
 	"github.com/williamnoble/kube-botany/pkg/plant"
-	"io"
 	"log/slog"
 	"os"
 	"strings"
@@ -116,25 +116,11 @@ func (s *ImageGenerationService) GenerateImageOpenAI(plant string) error {
 // GenerateMockImage uses a placeholder image to generate a mock image for a given plant.
 func (s *ImageGenerationService) GenerateMockImage(plant string) error {
 	plantName := strings.Split(plant, "-")[3]
-	sourcePlaceholderImg := fmt.Sprintf("%s/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
-	destinationImg := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
-	src, err := os.Open(sourcePlaceholderImg)
-	if err != nil {
-		return fmt.Errorf("error opening source file: %w", err)
-	}
-	defer src.Close()
-
-	dst, err := os.Create(destinationImg)
-	if err != nil {
-		return fmt.Errorf("error opening destinationImg file: %w", err)
-	}
-
-	_, err = io.Copy(dst, src)
-	if err != nil {
-		return fmt.Errorf("error copying file contents: %w", err)
-	}
-
-	return nil
+	srcFileName := fmt.Sprintf("%s/%s", s.staticDir, fmt.Sprintf("0001-01-01-%s", plantName))
+	dstFileName := fmt.Sprintf("%s/images/%s", s.staticDir, plant)
+	// just for local testing
+	err := fs.CopyImage(srcFileName, dstFileName)
+	return err
 }
 
 // GenerateText generates text using OpenAI's GPT-4o model.
