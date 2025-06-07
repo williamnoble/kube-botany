@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/williamnoble/kube-botany/pkg/config"
+	"github.com/williamnoble/kube-botany/pkg/repository"
 	"github.com/williamnoble/kube-botany/pkg/server"
 	"log"
 	"net/http"
@@ -19,7 +20,12 @@ func main() {
 		log.Fatalf("failed to read config: %v", err)
 	}
 
-	svr, err := server.NewServer(true)
+	inMemoryStore, err := repository.NewInMemoryStore(true)
+	if err != nil {
+		log.Fatalf("server: failed to create in-memory store: %v\n", err)
+	}
+
+	svr, err := server.NewServer(inMemoryStore)
 	if err != nil {
 		log.Fatal(err)
 	}

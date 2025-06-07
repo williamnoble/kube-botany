@@ -42,6 +42,12 @@ type PlantRepository interface {
 
 	// Variety returns the characteristics of a particular variety of plant
 	Variety(variety string) (plant.Variety, error)
+
+	// ImageExists returns true when an image exists for the given key
+	ImageExists(key string, fileName string) bool
+
+	// SetImage saves an image using the given key
+	SetImage(id string, fileName string, image []byte)
 }
 
 type InMemoryStore struct {

@@ -29,15 +29,11 @@ type Server struct {
 
 // NewServer creates a new httpServer instance with the given plants
 // It initialises the logger, renderer, templates, and other httpServer components
-func NewServer(populateStore bool) (*Server, error) {
+func NewServer(inMemoryStore repository.PlantRepository) (*Server, error) {
 	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
-	inMemoryStore, err := repository.NewInMemoryStore(populateStore)
-	if err != nil {
-		return nil, fmt.Errorf("server: failed to create in-memory store: %w", err)
-	}
 
 	s := &Server{
 		Logger:    logger,
