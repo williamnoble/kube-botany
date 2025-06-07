@@ -37,6 +37,7 @@ func createTempVarietyFile(t *testing.T) (string, func()) {
 }
 
 func TestVarietiesFromJson(t *testing.T) {
+	t.Parallel()
 	file, remove := createTempVarietyFile(t)
 	defer remove()
 	varieties, err := VarietiesFromJson(file)

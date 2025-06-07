@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/williamnoble/kube-botany/pkg/config"
 	"github.com/williamnoble/kube-botany/pkg/server"
 	"log"
 	"net/http"
@@ -13,6 +14,11 @@ import (
 )
 
 func main() {
+	c, err := config.NewFromEnvironment()
+	if err != nil {
+		log.Fatalf("failed to read config: %v", err)
+	}
+
 	svr, err := server.NewServer(true)
 	if err != nil {
 		log.Fatal(err)
@@ -21,7 +27,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
-		if err := svr.Start(8090); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := svr.Start(c.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			svr.Logger.With("component", "server").Error("server error", "error", err)
 			panic(err)
 		}

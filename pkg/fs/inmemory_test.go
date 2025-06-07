@@ -6,6 +6,8 @@ import (
 )
 
 func TestInMemoryStore(t *testing.T) {
+	t.Parallel()
+
 	store := NewInMemoryImageStore()
 
 	const fakeKey = "fake-key"

@@ -29,6 +29,7 @@ func testPlant(t *testing.T) (*plant.Plant, time.Time) {
 }
 
 func TestWater(t *testing.T) {
+	t.Parallel()
 	p, currentTime := testPlant(t)
 
 	// water to 100%
@@ -42,6 +43,7 @@ func TestWater(t *testing.T) {
 }
 
 func TestUpdateWaterConsumption(t *testing.T) {
+	t.Parallel()
 	p, currentTime := testPlant(t)
 
 	// set the water level to 50, elapse two days and update the plant
@@ -54,6 +56,7 @@ func TestUpdateWaterConsumption(t *testing.T) {
 }
 
 func TestUpdateGrowth(t *testing.T) {
+	t.Parallel()
 	// growth is 0 when the plant is created
 	p, currentTime := testPlant(t)
 

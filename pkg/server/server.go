@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -55,7 +56,12 @@ func NewServer(populateStore bool) (*Server, error) {
 
 // Start starts the HTTP httpServer on the specified port
 // It sets up the routes, adds the request logger middleware, and starts listening for requests
-func (s *Server) Start(port int) error {
+func (s *Server) Start(portStr string) error {
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return err
+	}
+
 	mux := s.Routes()
 	addr := fmt.Sprintf(":%d", port)
 
