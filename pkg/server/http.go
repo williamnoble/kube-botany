@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/williamnoble/kube-botany/types"
+	"github.com/williamnoble/kube-botany/pkg/types"
 	"net/http"
 )
 

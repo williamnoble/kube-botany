@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	chi "github.com/go-chi/chi/v5"
-	"github.com/williamnoble/kube-botany/types"
+	"github.com/williamnoble/kube-botany/pkg/types"
 	"net/http"
 	"time"
 )

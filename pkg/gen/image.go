@@ -7,7 +7,7 @@ import (
 	"fmt"
 	openai "github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
-	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/pkg/plant"
 	"io"
 	"log/slog"
 	"os"

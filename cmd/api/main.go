@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/williamnoble/kube-botany/server"
+	"github.com/williamnoble/kube-botany/pkg/server"
 	"log"
 	"net/http"
 	"os"

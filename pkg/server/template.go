@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/williamnoble/kube-botany/static/templates"
+	"github.com/williamnoble/kube-botany/pkg/static/templates"
 	"html/template"
 )
 

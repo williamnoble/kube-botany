@@ -3,10 +3,9 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/williamnoble/kube-botany/fs"
-	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/pkg/fs"
+	"github.com/williamnoble/kube-botany/pkg/plant"
 	"maps"
-	"path/filepath"
 	"slices"
 	"sync"
 	"time"
@@ -52,11 +51,10 @@ type InMemoryStore struct {
 	mu              sync.RWMutex // Mutex for thread-safe access to plants
 }
 
-func NewInMemoryStore(populateStore bool) (PlantRepository, error) {
-	filePath := filepath.Join("./plant/", "varieties.json")
-	props, err := plant.VarietiesFromJson(filePath)
+func NewInMemoryStore(populateStore bool, varietiesFilePath string) (PlantRepository, error) {
+	props, err := plant.VarietiesFromJson(varietiesFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
+		return nil, fmt.Errorf("store: failed to create in-memory store: %w", err)
 	}
 
 	s := InMemoryStore{

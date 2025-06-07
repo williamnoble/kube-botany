@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/pkg/plant"
 )
 
 // PlantDTO represents a plant in API responses and UI rendering

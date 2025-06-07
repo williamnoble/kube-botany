@@ -1,0 +1,25 @@
+### List all plants
+GET {{localhost}}/{{api}}
+
+### Get plant (DefaultBonsai123)
+GET {{localhost}}/{{api}}/{{bonsai}}
+
+### Get plant (DefaultBonsai123) with Ascii format
+GET {{localhost}}/{{api}}/{{bonsai}}/format/ascii
+
+### Water plant (DefaultBonsai123)
+POST {{localhost}}/{{api}}/water/{{bonsai}}
+
+### DELETE a plant (DefaultBonsai123)
+DELETE {{localhost}}/{{api}}/{{bonsai}}
+
+### CREATE a new plant (DefaultBonsai234)
+POST {{localhost}}/{{api}}
+Content-Type: application/json
+
+{
+  "namespaced_name": "defaultCactus246",
+  "friendly_name": "my-cactus",
+  "variety": "cactus"
+}
+

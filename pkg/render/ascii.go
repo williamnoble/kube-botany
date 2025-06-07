@@ -2,7 +2,7 @@ package render
 
 import (
 	"fmt"
-	"github.com/williamnoble/kube-botany/plant"
+	"github.com/williamnoble/kube-botany/pkg/plant"
 )
 
 // ASCIIRenderer renders the plant as ASCII art

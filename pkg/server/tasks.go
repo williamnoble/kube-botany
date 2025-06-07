@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/williamnoble/kube-botany/gen"
+	"github.com/williamnoble/kube-botany/pkg/gen"
 	"time"
 )
 

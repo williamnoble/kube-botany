@@ -3,12 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/williamnoble/kube-botany/render"
-	"github.com/williamnoble/kube-botany/repository"
+	"github.com/williamnoble/kube-botany/pkg/render"
+	"github.com/williamnoble/kube-botany/pkg/repository"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -33,16 +34,17 @@ func NewServer(populateStore bool) (*Server, error) {
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(logHandler)
-	inMemoryStore, err := repository.NewInMemoryStore(populateStore)
+	filePath := filepath.Join("pkg/plant/", "varieties.json")
+	inMemoryStore, err := repository.NewInMemoryStore(populateStore, filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create in-memory store: %w", err)
+		return nil, fmt.Errorf("server: failed to create in-memory store: %w", err)
 	}
 
 	s := &Server{
 		Logger:    logger,
 		startTime: time.Now(),
 		templates: make(map[string]*template.Template),
-		staticDir: "static",
+		staticDir: "pkg/static",
 		store:     inMemoryStore,
 		renderer:  render.NewASCIIRenderer(),
 	}

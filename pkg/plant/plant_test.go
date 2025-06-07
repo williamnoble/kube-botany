@@ -3,11 +3,8 @@ package plant_test
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/williamnoble/kube-botany/plant"
-	"github.com/williamnoble/kube-botany/repository"
-	"os"
-	"path"
-	"runtime"
+	"github.com/williamnoble/kube-botany/pkg/plant"
+	"github.com/williamnoble/kube-botany/pkg/repository"
 	"testing"
 	"time"
 )
@@ -15,11 +12,7 @@ import (
 // the newInMemoryStore fn returns a new in-memory store for testing, filepath is incorrect if we use the std func.
 func newInMemoryStore(t *testing.T) repository.PlantRepository {
 	t.Helper()
-	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Join(path.Dir(filename), "..")
-	err := os.Chdir(dir)
-	require.NoError(t, err)
-	s, err := repository.NewInMemoryStore(false)
+	s, err := repository.NewInMemoryStore(false, "varieties.json")
 	require.NoError(t, err)
 	return s
 }
