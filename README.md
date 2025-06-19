@@ -8,7 +8,7 @@ image generation at the moment. Most other functions are complete, with tests.
 
 ## Overview
 
-![kube-botany overview](assets/kube-botany.png)
+![kube-botany overview](assets/screenshot.png)
 
 ## TODO (missing features)
 - [ ] Implement Operator (currently in-progress, I'm writing with kube-builder and experimenting with controller-runtime
